@@ -1,5 +1,5 @@
 
-import { Users, Search, Calendar, Trophy, MessageCircle, Target } from "lucide-react";
+import { Users, Search, Calendar } from "lucide-react";
 
 const features = [
   {
@@ -15,22 +15,7 @@ const features = [
   {
     icon: Calendar,
     title: "Планирование тренировок",
-    description: "Организуйте тренировки, турниры и встречи с удобным календарем"
-  },
-  {
-    icon: Trophy,
-    title: "Отслеживание достижений",
-    description: "Ведите статистику, отмечайте достижения и прогресс команды"
-  },
-  {
-    icon: MessageCircle,
-    title: "Командное общение",
-    description: "Общайтесь с игроками, обсуждайте стратегию и планы"
-  },
-  {
-    icon: Target,
-    title: "Подбор по навыкам",
-    description: "Система матчинга находит идеальных партнеров для игры"
+    description: "Организуйте тренировки с удобным планированием"
   }
 ];
 

@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <footer className="bg-sport-navy text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
@@ -37,20 +37,6 @@ const Footer = () => {
               <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Найти команду</a></li>
               <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Найти игроков</a></li>
               <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Создать команду</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Тренировки</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Турниры</a></li>
-            </ul>
-          </div>
-
-          {/* Sports */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Виды спорта</h3>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Футбол</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Баскетбол</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Волейбол</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Теннис</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">Хоккей</a></li>
             </ul>
           </div>
 
@@ -78,7 +64,7 @@ const Footer = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-300 text-sm mb-4 md:mb-0">
-            © 2024 FindPlayer. Все права защищены.
+            © 2025 FindPlayer. Все права защищены.
           </div>
           <div className="flex space-x-6 text-sm">
             <a href="#" className="text-gray-300 hover:text-sport-orange transition-colors">

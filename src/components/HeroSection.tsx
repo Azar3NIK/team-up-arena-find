@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Search, Users, Trophy, Calendar } from "lucide-react";
+import { Search, Users } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -30,33 +30,6 @@ const HeroSection = () => {
               <Search className="mr-2 h-5 w-5" />
               Найти игроков
             </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center animate-fade-in">
-              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
-                <Users className="h-12 w-12 text-sport-orange mx-auto mb-4" />
-                <div className="text-3xl font-bold mb-2">1,200+</div>
-                <div className="text-lg opacity-90">Активных игроков</div>
-              </div>
-            </div>
-            
-            <div className="text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
-                <Trophy className="h-12 w-12 text-sport-orange mx-auto mb-4" />
-                <div className="text-3xl font-bold mb-2">300+</div>
-                <div className="text-lg opacity-90">Команд</div>
-              </div>
-            </div>
-            
-            <div className="text-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
-                <Calendar className="h-12 w-12 text-sport-orange mx-auto mb-4" />
-                <div className="text-3xl font-bold mb-2">500+</div>
-                <div className="text-lg opacity-90">Тренировок в месяц</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

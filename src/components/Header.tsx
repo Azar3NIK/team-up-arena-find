@@ -27,9 +27,6 @@ const Header = () => {
               Найти игроков
             </a>
             <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
-              Тренировки
-            </a>
-            <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
               О нас
             </a>
           </nav>
@@ -62,9 +59,6 @@ const Header = () => {
               </a>
               <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
                 Найти игроков
-              </a>
-              <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
-                Тренировки
               </a>
               <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
                 О нас
