@@ -1,10 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Trophy } from "lucide-react";
-
 const CTASection = () => {
-  return (
-    <section className="py-20 relative overflow-hidden">
+  return <section className="py-20 relative overflow-hidden">
       <div className="absolute inset-0 gradient-sport"></div>
       
       <div className="relative container mx-auto px-4">
@@ -36,7 +33,7 @@ const CTASection = () => {
               Начать поиск
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-sport-blue px-8 py-3 text-lg">
+            <Button size="lg" variant="outline" className="border-white hover:bg-white px-8 py-3 text-lg text-gray-800">
               Создать команду
             </Button>
           </div>
@@ -49,10 +46,12 @@ const CTASection = () => {
 
       {/* Decorative Elements */}
       <div className="absolute top-10 left-10 w-20 h-20 bg-white/5 rounded-full animate-pulse"></div>
-      <div className="absolute bottom-10 right-10 w-16 h-16 bg-sport-orange/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-      <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-sport-green/20 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
-    </section>
-  );
+      <div className="absolute bottom-10 right-10 w-16 h-16 bg-sport-orange/20 rounded-full animate-pulse" style={{
+      animationDelay: '1s'
+    }}></div>
+      <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-sport-green/20 rounded-full animate-pulse" style={{
+      animationDelay: '2s'
+    }}></div>
+    </section>;
 };
-
 export default CTASection;

@@ -1,10 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { Search, Users } from "lucide-react";
-
 const HeroSection = () => {
-  return (
-    <section className="relative overflow-hidden">
+  return <section className="relative overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 gradient-sport"></div>
       
@@ -26,7 +23,7 @@ const HeroSection = () => {
               <Users className="mr-2 h-5 w-5" />
               Найти команду
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-sport-blue px-8 py-3 text-lg">
+            <Button size="lg" variant="outline" className="border-white hover:bg-white px-8 py-3 text-lg text-gray-800">
               <Search className="mr-2 h-5 w-5" />
               Найти игроков
             </Button>
@@ -40,8 +37,6 @@ const HeroSection = () => {
           <path d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" fill="currentColor"></path>
         </svg>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
