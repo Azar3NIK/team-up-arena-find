@@ -66,7 +66,7 @@ export const PlayerFilters = ({ filters, onFiltersChange }: PlayerFiltersProps) 
               <SelectValue placeholder="Выберите спорт" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все виды спорта</SelectItem>
+              <SelectItem value="any">Все виды спорта</SelectItem>
               <SelectItem value="football">Футбол</SelectItem>
               <SelectItem value="basketball">Баскетбол</SelectItem>
               <SelectItem value="volleyball">Волейбол</SelectItem>
@@ -82,7 +82,7 @@ export const PlayerFilters = ({ filters, onFiltersChange }: PlayerFiltersProps) 
               <SelectValue placeholder="Выберите позицию" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Любая позиция</SelectItem>
+              <SelectItem value="any">Любая позиция</SelectItem>
               <SelectItem value="goalkeeper">Вратарь</SelectItem>
               <SelectItem value="defender">Защитник</SelectItem>
               <SelectItem value="midfielder">Полузащитник</SelectItem>
@@ -107,7 +107,7 @@ export const PlayerFilters = ({ filters, onFiltersChange }: PlayerFiltersProps) 
               <SelectValue placeholder="Выберите опыт" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Любой опыт</SelectItem>
+              <SelectItem value="any">Любой опыт</SelectItem>
               <SelectItem value="beginner">Новичок</SelectItem>
               <SelectItem value="amateur">Любитель</SelectItem>
               <SelectItem value="semi-pro">Полупрофессионал</SelectItem>
