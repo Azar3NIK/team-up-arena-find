@@ -1,142 +1,183 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, Trophy, Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, Bell, Calendar, User, Search, UserPlus, Info } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  
-  // Данные дашборда (в реальном приложении будут загружаться с сервера)
-  const [stats] = useState({
-    totalPlayers: 156,
-    activeTrainings: 8,
-    completedMatches: 23,
-    upcomingEvents: 3
-  });
-
-  const [recentActivities] = useState([
-    { id: 1, type: "training", text: "Тренировка по футболу", date: "Сегодня, 18:00", status: "upcoming" },
-    { id: 2, type: "match", text: "Матч против команды Спартак", date: "Вчера", status: "completed" },
-    { id: 3, type: "player", text: "Новый игрок присоединился к команде", date: "2 дня назад", status: "new" },
-    { id: 4, type: "training", text: "Тренировка завершена", date: "3 дня назад", status: "completed" }
-  ]);
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Панель управления</h1>
-        <p className="text-gray-600">Добро пожаловать в спортивную платформу</p>
-      </div>
-
-      {/* Статистика */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Всего игроков</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalPlayers}</div>
-            <p className="text-xs text-muted-foreground">+12% с прошлого месяца</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Активные тренировки</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.activeTrainings}</div>
-            <p className="text-xs text-muted-foreground">+3 новые на этой неделе</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Завершенные матчи</CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.completedMatches}</div>
-            <p className="text-xs text-muted-foreground">18 побед, 5 поражений</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Предстоящие события</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.upcomingEvents}</div>
-            <p className="text-xs text-muted-foreground">На этой неделе</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Быстрые действия */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Быстрые действия</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button 
-              className="w-full justify-start" 
-              variant="outline"
-              onClick={() => navigate('/create-training')}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Создать тренировку
-            </Button>
-            <Button 
-              className="w-full justify-start" 
-              variant="outline"
-              onClick={() => navigate('/find-players')}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              Найти игроков
-            </Button>
-            <Button 
-              className="w-full justify-start" 
-              variant="outline"
-              onClick={() => navigate('/find-teams')}
-            >
-              <Trophy className="h-4 w-4 mr-2" />
-              Найти команды
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Последние активности */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Последние активности</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.status === 'upcoming' ? 'bg-blue-500' :
-                    activity.status === 'completed' ? 'bg-green-500' : 'bg-yellow-500'
-                  }`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">
-                      {activity.text}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {activity.date}
-                    </p>
-                  </div>
-                </div>
-              ))}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 gradient-sport rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-sport-navy">FindPlayer</span>
             </div>
-          </CardContent>
-        </Card>
+            
+            <div className="flex items-center space-x-4">
+              <Link to="/notifications">
+                <Button variant="ghost" size="sm" className="relative">
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 bg-sport-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    3
+                  </span>
+                </Button>
+              </Link>
+              <Link to="/profile">
+                <Button variant="ghost" size="sm">
+                  <User className="h-5 w-5 mr-2" />
+                  Профиль
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-sport-navy mb-2">
+            Добро пожаловать, Игрок!
+          </h1>
+          <p className="text-gray-600">
+            Управляйте своим профилем и найдите идеальную команду или игроков
+          </p>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Link to="/profile">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-lg">
+                  <User className="h-5 w-5 text-sport-blue mr-2" />
+                  Личный кабинет
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Редактируйте профиль и настройки
+                </CardDescription>
+              </CardContent>
+            </Link>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Link to="/notifications">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-lg">
+                  <Bell className="h-5 w-5 text-sport-orange mr-2" />
+                  Уведомления
+                  <span className="ml-2 bg-sport-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    3
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Новые приглашения и сообщения
+                </CardDescription>
+              </CardContent>
+            </Link>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Link to="/training">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-lg">
+                  <Calendar className="h-5 w-5 text-sport-green mr-2" />
+                  Тренировки
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Расписание и участие в тренировках
+                </CardDescription>
+              </CardContent>
+            </Link>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Link to="/my-team">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-lg">
+                  <Users className="h-5 w-5 text-sport-navy mr-2" />
+                  Моя команда
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Управление командой и составом
+                </CardDescription>
+              </CardContent>
+            </Link>
+          </Card>
+        </div>
+
+        {/* Main Navigation */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Link to="/find-team">
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl">
+                  <Search className="h-6 w-6 text-sport-blue mr-3" />
+                  Найти команду
+                </CardTitle>
+                <CardDescription>
+                  Ищите команды по виду спорта, уровню и местоположению
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full gradient-orange text-white hover:opacity-90">
+                  Начать поиск
+                </Button>
+              </CardContent>
+            </Link>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Link to="/find-players">
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl">
+                  <UserPlus className="h-6 w-6 text-sport-green mr-3" />
+                  Найти игроков
+                </CardTitle>
+                <CardDescription>
+                  Найдите игроков для своей команды по навыкам и позициям
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full gradient-orange text-white hover:opacity-90">
+                  Поиск игроков
+                </Button>
+              </CardContent>
+            </Link>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Link to="/about">
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl">
+                  <Info className="h-6 w-6 text-sport-gray mr-3" />
+                  О нас
+                </CardTitle>
+                <CardDescription>
+                  Узнайте больше о платформе FindPlayer
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">
+                  Подробнее
+                </Button>
+              </CardContent>
+            </Link>
+          </Card>
+        </div>
       </div>
     </div>
   );
