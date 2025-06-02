@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import PersonalCabinet from "./pages/PersonalCabinet";
 import FindPlayers from "./pages/FindPlayers";
 import FindTeams from "./pages/FindTeams";
 import PlayerProfile from "./pages/PlayerProfile";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/personal-cabinet" element={<PersonalCabinet />} />
           <Route path="/find-players" element={<FindPlayers />} />
           <Route path="/find-teams" element={<FindTeams />} />
           <Route path="/player/:id" element={<PlayerProfile />} />
