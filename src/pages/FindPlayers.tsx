@@ -13,62 +13,62 @@ const mockPlayers = [
     id: "1",
     name: "Александр Петров",
     avatar: "/placeholder.svg",
-    position: "Нападающий",
-    rating: 4.5,
     location: "Москва",
     sport: "Футбол",
     experience: "Любитель",
-    teamStatus: "looking" as const
+    teamStatus: "looking" as const,
+    age: 25,
+    gender: "Мужской"
   },
   {
     id: "2", 
     name: "Елена Сидорова",
-    position: "Защитник",
-    rating: 4.2,
     location: "Санкт-Петербург",
-    sport: "Футбол",
+    sport: "Волейбол",
     experience: "Полупрофессионал",
-    teamStatus: "has-team" as const
+    teamStatus: "has-team" as const,
+    age: 28,
+    gender: "Женский"
   },
   {
     id: "3",
     name: "Дмитрий Козлов",
-    position: "Полузащитник",
-    rating: 3.8,
     location: "Казань",
     sport: "Футбол", 
     experience: "Новичок",
-    teamStatus: "looking" as const
+    teamStatus: "looking" as const,
+    age: 19,
+    gender: "Мужской"
   },
   {
     id: "4",
     name: "Анна Волкова",
-    position: "Вратарь",
-    rating: 4.7,
     location: "Екатеринбург",
     sport: "Футбол",
     experience: "Профессионал",
-    teamStatus: "not-looking" as const
+    teamStatus: "not-looking" as const,
+    age: 32,
+    gender: "Женский"
   },
   {
     id: "5",
     name: "Игорь Морозов",
-    position: "Защитник",
-    rating: 4.0,
     location: "Новосибирск",
     sport: "Футбол",
     experience: "Любитель",
-    teamStatus: "looking" as const
+    teamStatus: "looking" as const,
+    age: 22,
+    gender: "Мужской"
   },
   {
     id: "6",
     name: "Мария Белова",
-    position: "Нападающий",
-    rating: 4.3,
     location: "Ростов-на-Дону",
     sport: "Футбол",
     experience: "Полупрофессионал",
-    teamStatus: "has-team" as const
+    teamStatus: "has-team" as const,
+    age: 26,
+    gender: "Женский"
   }
 ];
 
@@ -76,11 +76,11 @@ const FindPlayers = () => {
   const [filters, setFilters] = useState({
     search: '',
     sport: '',
-    position: '',
     location: '',
     experience: '',
     teamStatus: [] as string[],
-    minRating: 0
+    age: '',
+    gender: ''
   });
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,17 +89,27 @@ const FindPlayers = () => {
 
   // Фильтрация игроков
   const filteredPlayers = mockPlayers.filter(player => {
-    const matchesSearch = player.name.toLowerCase().includes(filters.search.toLowerCase());
-    const matchesSport = !filters.sport || player.sport.toLowerCase() === filters.sport.toLowerCase();
-    const matchesPosition = !filters.position || player.position.toLowerCase().includes(filters.position.toLowerCase());
+    // Для текстовых полей используем частичное совпадение
+    const matchesSearch = !filters.search || player.name.toLowerCase().includes(filters.search.toLowerCase());
+    const matchesSport = !filters.sport || player.sport.toLowerCase().includes(filters.sport.toLowerCase());
     const matchesLocation = !filters.location || player.location.toLowerCase().includes(filters.location.toLowerCase());
-    const matchesExperience = !filters.experience || player.experience.toLowerCase() === filters.experience.toLowerCase();
+    
+    // Для выпадающих списков используем точное сравнение (кроме случая сброса)
+    const matchesExperience = !filters.experience || filters.experience === "all" || player.experience === filters.experience;
+    const matchesGender = !filters.gender || filters.gender === "all" || player.gender === filters.gender;
+    
+    // Для статуса команды проверяем наличие в массиве
     const matchesTeamStatus = filters.teamStatus.length === 0 || filters.teamStatus.includes(player.teamStatus);
-    const matchesRating = player.rating >= filters.minRating;
-
-    return matchesSearch && matchesSport && matchesPosition && matchesLocation && 
-           matchesExperience && matchesTeamStatus && matchesRating;
+    
+    // Для возраста преобразуем число в строку для сравнения
+    const matchesAge = !filters.age || player.age.toString() === filters.age;
+    
+    return matchesSearch && matchesSport && matchesLocation && 
+           matchesExperience && matchesTeamStatus && matchesAge && matchesGender;
   });
+
+console.log("Filters:", filters);
+console.log("Filtered players:", filteredPlayers);
 
   // Пагинация
   const totalPages = Math.ceil(filteredPlayers.length / playersPerPage);

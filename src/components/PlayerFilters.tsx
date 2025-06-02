@@ -10,11 +10,11 @@ interface PlayerFiltersProps {
   filters: {
     search: string;
     sport: string;
-    position: string;
     location: string;
     experience: string;
     teamStatus: string[];
-    minRating: number;
+    age: string;
+    gender: string;
   };
   onFiltersChange: (filters: any) => void;
 }
@@ -35,11 +35,11 @@ export const PlayerFilters = ({ filters, onFiltersChange }: PlayerFiltersProps) 
     onFiltersChange({
       search: '',
       sport: '',
-      position: '',
       location: '',
       experience: '',
       teamStatus: [],
-      minRating: 0
+      age: '',
+      gender: ''
     });
   };
 
@@ -61,38 +61,15 @@ export const PlayerFilters = ({ filters, onFiltersChange }: PlayerFiltersProps) 
 
         <div>
           <Label>Вид спорта</Label>
-          <Select value={filters.sport} onValueChange={(value) => updateFilter('sport', value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Выберите спорт" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="any">Все виды спорта</SelectItem>
-              <SelectItem value="football">Футбол</SelectItem>
-              <SelectItem value="basketball">Баскетбол</SelectItem>
-              <SelectItem value="volleyball">Волейбол</SelectItem>
-              <SelectItem value="tennis">Теннис</SelectItem>
-            </SelectContent>
-          </Select>
+          <Input
+            placeholder="Введите вид спорта"
+            value={filters.sport}
+            onChange={(e) => updateFilter('sport', e.target.value)}
+          />
         </div>
 
         <div>
-          <Label>Позиция</Label>
-          <Select value={filters.position} onValueChange={(value) => updateFilter('position', value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Выберите позицию" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="any">Любая позиция</SelectItem>
-              <SelectItem value="goalkeeper">Вратарь</SelectItem>
-              <SelectItem value="defender">Защитник</SelectItem>
-              <SelectItem value="midfielder">Полузащитник</SelectItem>
-              <SelectItem value="forward">Нападающий</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label>Город</Label>
+          <Label>Местоположение</Label>
           <Input
             placeholder="Введите город"
             value={filters.location}
@@ -101,17 +78,42 @@ export const PlayerFilters = ({ filters, onFiltersChange }: PlayerFiltersProps) 
         </div>
 
         <div>
-          <Label>Опыт</Label>
+          <Label>Уровень игры</Label>
           <Select value={filters.experience} onValueChange={(value) => updateFilter('experience', value)}>
             <SelectTrigger>
               <SelectValue placeholder="Выберите опыт" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="any">Любой опыт</SelectItem>
-              <SelectItem value="beginner">Новичок</SelectItem>
-              <SelectItem value="amateur">Любитель</SelectItem>
-              <SelectItem value="semi-pro">Полупрофессионал</SelectItem>
-              <SelectItem value="professional">Профессионал</SelectItem>
+              <SelectItem value="all">Любой уровень</SelectItem>
+              <SelectItem value="Новичок">Новичок</SelectItem>
+              <SelectItem value="Любитель">Любитель</SelectItem>
+              <SelectItem value="Полупрофессионал">Полупрофессионал</SelectItem>
+              <SelectItem value="Профессионал">Профессионал</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Возраст</Label>
+          <Input
+            type="number"
+            placeholder="Введите возраст"
+            value={filters.age}
+            onChange={(e) => updateFilter('age', e.target.value)}
+            min="0"
+          />
+        </div>
+
+         <div>
+          <Label>Пол</Label>
+          <Select value={filters.gender} onValueChange={(value) => updateFilter('gender', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Выберите пол" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Любой</SelectItem>
+              <SelectItem value="Мужской">Мужской</SelectItem>
+              <SelectItem value="Женский">Женский</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -144,20 +146,6 @@ export const PlayerFilters = ({ filters, onFiltersChange }: PlayerFiltersProps) 
               <Label htmlFor="not-looking">Не ищет команду</Label>
             </div>
           </div>
-        </div>
-
-        <div>
-          <Label htmlFor="rating">Минимальный рейтинг</Label>
-          <Input
-            id="rating"
-            type="number"
-            min="0"
-            max="5"
-            step="0.1"
-            placeholder="0.0"
-            value={filters.minRating || ''}
-            onChange={(e) => updateFilter('minRating', parseFloat(e.target.value) || 0)}
-          />
         </div>
 
         <Button variant="outline" onClick={resetFilters} className="w-full">

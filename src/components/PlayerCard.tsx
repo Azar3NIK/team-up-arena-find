@@ -1,9 +1,8 @@
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, Users } from "lucide-react";
+import { MapPin,  Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PlayerCardProps {
@@ -11,12 +10,12 @@ interface PlayerCardProps {
     id: string;
     name: string;
     avatar?: string;
-    position: string;
-    rating: number;
     location: string;
     sport: string;
     experience: string;
     teamStatus: 'looking' | 'has-team' | 'not-looking';
+    age: number;
+    gender: string;
   };
 }
 
@@ -48,19 +47,18 @@ export const PlayerCard = ({ player }: PlayerCardProps) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-semibold truncate">{player.name}</h3>
-              <div className="flex items-center space-x-1">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm font-medium">{player.rating}</span>
-              </div>
             </div>
             
             <div className="space-y-1">
-              <p className="text-sm text-gray-600">{player.position}</p>
               <div className="flex items-center space-x-1 text-sm text-gray-500">
                 <MapPin className="h-3 w-3" />
                 <span>{player.location}</span>
               </div>
-              <p className="text-sm text-gray-500">Опыт: {player.experience}</p>
+              <div className="flex gap-2">
+                <p className="text-sm text-gray-500">Возраст: {player.age}</p>
+                <p className="text-sm text-gray-500">Пол: {player.gender}</p>
+              </div>
+              <p className="text-sm text-gray-500">Уровень игры: {player.experience}</p>
             </div>
             
             <div className="flex items-center justify-between mt-3">
