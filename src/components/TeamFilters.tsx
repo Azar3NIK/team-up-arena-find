@@ -13,7 +13,6 @@ interface TeamFiltersProps {
     location: string;
     level: string;
     foundedYear: string;
-    isRecruiting: boolean;
   };
   onFiltersChange: (filters: any) => void;
 }
@@ -29,8 +28,7 @@ export const TeamFilters = ({ filters, onFiltersChange }: TeamFiltersProps) => {
       sport: '',
       location: '',
       level: '',
-      foundedYear: '',
-      isRecruiting: false
+      foundedYear: ''
     });
   };
 
@@ -94,17 +92,6 @@ export const TeamFilters = ({ filters, onFiltersChange }: TeamFiltersProps) => {
             min="1900"
             max={new Date().getFullYear()}
           />
-        </div>
-
-        <div>
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="recruiting"
-              checked={filters.isRecruiting}
-              onCheckedChange={(checked) => updateFilter('isRecruiting', checked as boolean)}
-            />
-            <Label htmlFor="recruiting">Только команды с открытым набором</Label>
-          </div>
         </div>
 
         <Button variant="outline" onClick={resetFilters} className="w-full">

@@ -18,8 +18,6 @@ const mockTeam = {
   level: "Профессионал",
   foundedYear: 2018,
   membersCount: 18,
-  maxMembers: 25,
-  isRecruiting: true,
   description: "Профессиональная футбольная команда, участвует в городских турнирах. Ищем талантливых игроков для усиления состава.",
   achievements: [
     "Чемпионы городской лиги 2023",
@@ -93,11 +91,6 @@ const TeamProfile = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-4">
                     <h1 className="text-3xl font-bold">{mockTeam.name}</h1>
-                    {mockTeam.isRecruiting && (
-                      <Badge variant="default" className="bg-green-500">
-                        Набор открыт
-                      </Badge>
-                    )}
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
@@ -111,7 +104,7 @@ const TeamProfile = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Users className="h-4 w-4" />
-                      <span>{mockTeam.membersCount}/{mockTeam.maxMembers} игроков</span>
+                      <span>{mockTeam.membersCount} игроков</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Trophy className="h-4 w-4" />
@@ -179,7 +172,7 @@ const TeamProfile = () => {
         {/* Боковая панель */}
         <div className="space-y-6">
           {/* Действия */}
-          {mockTeam.isRecruiting && (
+          {
             <Card>
               <CardHeader>
                 <CardTitle>Присоединиться к команде</CardTitle>
@@ -197,7 +190,7 @@ const TeamProfile = () => {
                 </Button>
               </CardContent>
             </Card>
-          )}
+          }
 
           {/* Контакты капитана */}
           <Card>
@@ -233,10 +226,6 @@ const TeamProfile = () => {
               <div className="flex justify-between">
                 <span>Всего игроков:</span>
                 <span className="font-semibold">{mockTeam.membersCount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Свободных мест:</span>
-                <span className="font-semibold">{mockTeam.maxMembers - mockTeam.membersCount}</span>
               </div>
               <div className="flex justify-between">
                 <span>Лет существования:</span>

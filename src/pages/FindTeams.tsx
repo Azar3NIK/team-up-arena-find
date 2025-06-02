@@ -19,7 +19,6 @@ const mockTeams = [
     foundedYear: 2018,
     membersCount: 18,
     maxMembers: 25,
-    isRecruiting: true,
     description: "Профессиональная футбольная команда, участвует в городских турнирах. Ищем талантливых игроков для усиления состава."
   },
   {
@@ -43,7 +42,6 @@ const mockTeams = [
     foundedYear: 2019,
     membersCount: 15,
     maxMembers: 22,
-    isRecruiting: false,
     description: "Любительская футбольная команда для активного отдыха и поддержания формы."
   },
   {
@@ -55,7 +53,6 @@ const mockTeams = [
     foundedYear: 2015,
     membersCount: 20,
     maxMembers: 25,
-    isRecruiting: true,
     description: "Хоккейная команда с богатыми традициями. Играем в местной лиге, стремимся к победам."
   },
   {
@@ -67,7 +64,6 @@ const mockTeams = [
     foundedYear: 2021,
     membersCount: 10,
     maxMembers: 12,
-    isRecruiting: true,
     description: "Молодая баскетбольная команда, приглашаем новых игроков для совместных тренировок и игр."
   },
   {
@@ -79,7 +75,6 @@ const mockTeams = [
     foundedYear: 2017,
     membersCount: 22,
     maxMembers: 25,
-    isRecruiting: false,
     description: "Стабильная команда с хорошими результатами в региональных турнирах."
   }
 ];
@@ -91,7 +86,6 @@ const FindTeams = () => {
     location: '',
     level: '',
     foundedYear: '',
-    isRecruiting: false
   });
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -105,10 +99,9 @@ const FindTeams = () => {
     const matchesLocation = !filters.location || team.location.toLowerCase().includes(filters.location.toLowerCase());
     const matchesLevel = !filters.level || filters.level === "all" || team.level === filters.level;
     const matchesYear = !filters.foundedYear || team.foundedYear.toString() === filters.foundedYear;
-    const matchesRecruiting = !filters.isRecruiting || team.isRecruiting;
     
     return matchesSearch && matchesSport && matchesLocation && 
-           matchesLevel && matchesYear && matchesRecruiting;
+           matchesLevel && matchesYear;
   });
 
   console.log("Team Filters:", filters);

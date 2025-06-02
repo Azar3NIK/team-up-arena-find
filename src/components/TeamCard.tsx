@@ -15,8 +15,6 @@ interface TeamCardProps {
     level: string;
     foundedYear: number;
     membersCount: number;
-    maxMembers: number;
-    isRecruiting: boolean;
     description: string;
   };
 }
@@ -36,9 +34,6 @@ export const TeamCard = ({ team }: TeamCardProps) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-semibold truncate">{team.name}</h3>
-              {team.isRecruiting && (
-                <Badge variant="default" className="bg-green-500">Набор открыт</Badge>
-              )}
             </div>
             
             <div className="space-y-1">
@@ -50,13 +45,13 @@ export const TeamCard = ({ team }: TeamCardProps) => {
                 <Calendar className="h-3 w-3" />
                 <span>Основана в {team.foundedYear}</span>
               </div>
-              <div className="flex items-center space-x-1 text-sm text-gray-500">
-                <Users className="h-3 w-3" />
-                <span>{team.membersCount}/{team.maxMembers} игроков</span>
-              </div>
               <p className="text-sm text-gray-500">Уровень: {team.level}</p>
             </div>
             
+            <div className="flex items-center space-x-1 text-sm text-gray-500">
+              <Users className="h-3 w-3" />
+              <span>Число игроков: {team.membersCount}</span>
+            </div>
             <p className="text-sm text-gray-600 mt-2 line-clamp-2">{team.description}</p>
             
             <div className="flex items-center justify-between mt-3">
