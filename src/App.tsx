@@ -9,7 +9,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import FindPlayers from "./pages/FindPlayers";
+import FindTeams from "./pages/FindTeams";
 import PlayerProfile from "./pages/PlayerProfile";
+import TeamProfile from "./pages/TeamProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,7 +28,9 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/find-players" element={<FindPlayers />} />
+          <Route path="/find-teams" element={<FindTeams />} />
           <Route path="/player/:id" element={<PlayerProfile />} />
+          <Route path="/team/:id" element={<TeamProfile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
