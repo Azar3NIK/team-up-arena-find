@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Users, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -17,11 +16,75 @@ const Register = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Заглушка для регистрации
+  const mockRegister = async (userData: typeof formData): Promise<{ success: boolean; message?: string }> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Проверка на существующий email
+        if (userData.email === "user@example.com") {
+          resolve({ success: false, message: "Пользователь с таким email уже существует" });
+          return;
+        }
+
+        // Проверка совпадения паролей
+        if (userData.password !== userData.confirmPassword) {
+          resolve({ success: false, message: "Пароли не совпадают" });
+          return;
+        }
+
+        // Проверка сложности пароля
+        if (userData.password.length < 6) {
+          resolve({ success: false, message: "Пароль должен содержать минимум 6 символов" });
+          return;
+        }
+
+        // Успешная регистрация
+        resolve({ success: true });
+      }, 1000);
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    console.log("Registration form submitted:", formData);
+    setError("");
+    setSuccess("");
+    setIsLoading(true);
+
+    try {
+      // Проверка заполнения всех полей
+      if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
+        setError("Пожалуйста, заполните все поля");
+        return;
+      }
+
+      // Проверка валидности email
+      if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+        setError("Пожалуйста, введите корректный email");
+        return;
+      }
+
+      // Используем заглушку для регистрации
+      const result = await mockRegister(formData);
+
+      if (result.success) {
+        setSuccess("Регистрация прошла успешно! Перенаправляем...");
+        console.log("Успешная регистрация:", formData);
+        // Перенаправляем через 1.5 секунды
+        setTimeout(() => navigate("/dashboard"), 1500);
+      } else {
+        setError(result.message || "Произошла ошибка при регистрации");
+      }
+    } catch (err) {
+      setError("Произошла ошибка при регистрации");
+      console.error("Registration error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +110,20 @@ const Register = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md flex items-center">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-md flex items-center">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <span className="text-sm">{success}</span>
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -95,7 +172,7 @@ const Register = () => {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Введите пароль"
+                  placeholder="Введите пароль (минимум 6 символов)"
                   value={formData.password}
                   onChange={handleInputChange}
                   required
@@ -132,8 +209,12 @@ const Register = () => {
               </div>
             </div>
             
-            <Button type="submit" className="w-full gradient-orange text-white hover:opacity-90">
-              Создать аккаунт
+            <Button 
+              type="submit" 
+              className="w-full gradient-orange text-white hover:opacity-90"
+              disabled={isLoading}
+            >
+              {isLoading ? "Регистрация..." : "Создать аккаунт"}
             </Button>
           </form>
           

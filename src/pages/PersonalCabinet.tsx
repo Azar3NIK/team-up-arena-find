@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,13 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Save, User } from "lucide-react";
+import { Camera, Save, User, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PersonalCabinet = () => {
   const { toast } = useToast();
   
-  // Данные профиля игрока (в реальном приложении будут загружаться с сервера)
   const [profile, setProfile] = useState({
     name: "Александр Петров",
     avatar: "/placeholder.svg",
@@ -35,14 +33,60 @@ const PersonalCabinet = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(profile);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Очищаем ошибку при изменении поля
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    const requiredFields = ['name', 'location', 'sport', 'position', 'age', 'gender', 'phone', 'email'];
+
+    requiredFields.forEach(field => {
+      if (!formData[field as keyof typeof formData]) {
+        newErrors[field] = 'Это поле обязательно для заполнения';
+      }
+    });
+
+    // Дополнительные проверки
+    if (formData.age && (formData.age < 10 || formData.age > 100)) {
+      newErrors.age = 'Введите корректный возраст (10-100)';
+    }
+
+    if (formData.phone && !/^\+?[\d\s()-]+$/.test(formData.phone)) {
+      newErrors.phone = 'Введите корректный номер телефона';
+    }
+
+    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = 'Введите корректный email';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = () => {
+    if (!validateForm()) {
+      toast({
+        title: "Ошибка валидации",
+        description: "Пожалуйста, заполните все обязательные поля корректно",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setProfile(formData);
     setIsEditing(false);
+    setErrors({});
     toast({
       title: "Профиль обновлен",
       description: "Ваши изменения успешно сохранены",
@@ -52,6 +96,7 @@ const PersonalCabinet = () => {
   const handleCancel = () => {
     setFormData(profile);
     setIsEditing(false);
+    setErrors({});
   };
 
   const getTeamStatusText = (status: string) => {
@@ -156,32 +201,50 @@ const PersonalCabinet = () => {
               {/* Основная информация */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">Имя и фамилия</Label>
+                  <Label htmlFor="name">Имя и фамилия*</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     disabled={!isEditing}
                   />
+                  {errors.name && (
+                    <div className="flex items-center text-red-500 text-sm mt-1">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      {errors.name}
+                    </div>
+                  )}
                 </div>
                 
                 <div>
-                  <Label htmlFor="location">Местоположение</Label>
+                  <Label htmlFor="location">Местоположение*</Label>
                   <Input
                     id="location"
                     value={formData.location}
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     disabled={!isEditing}
                   />
+                  {errors.location && (
+                    <div className="flex items-center text-red-500 text-sm mt-1">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      {errors.location}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <Label>Вид спорта</Label>
+                  <Label>Вид спорта*</Label>
                   <Input
                     value={formData.sport}
                     onChange={(e) => handleInputChange('sport', e.target.value)}
                     disabled={!isEditing}
                   />
+                  {errors.sport && (
+                    <div className="flex items-center text-red-500 text-sm mt-1">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      {errors.sport}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -204,18 +267,25 @@ const PersonalCabinet = () => {
                 </div>
 
                 <div>
-                  <Label>Возраст</Label>
+                  <Label>Возраст*</Label>
                   <Input
                     type="number"
                     value={formData.age}
                     onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
                     disabled={!isEditing}
-                    min="0"
+                    min="10"
+                    max="100"
                   />
+                  {errors.age && (
+                    <div className="flex items-center text-red-500 text-sm mt-1">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      {errors.age}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <Label>Пол</Label>
+                  <Label>Пол*</Label>
                   <Select 
                     value={formData.gender} 
                     onValueChange={(value) => handleInputChange('gender', value)}
@@ -229,15 +299,27 @@ const PersonalCabinet = () => {
                       <SelectItem value="Женский">Женский</SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.gender && (
+                    <div className="flex items-center text-red-500 text-sm mt-1">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      {errors.gender}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <Label>Позиция</Label>
+                  <Label>Позиция*</Label>
                   <Input
                     value={formData.position}
                     onChange={(e) => handleInputChange('position', e.target.value)}
                     disabled={!isEditing}
                   />
+                  {errors.position && (
+                    <div className="flex items-center text-red-500 text-sm mt-1">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      {errors.position}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -265,7 +347,8 @@ const PersonalCabinet = () => {
                     value={formData.height}
                     onChange={(e) => handleInputChange('height', parseInt(e.target.value))}
                     disabled={!isEditing}
-                    min="0"
+                    min="100"
+                    max="250"
                   />
                 </div>
 
@@ -276,7 +359,8 @@ const PersonalCabinet = () => {
                     value={formData.weight}
                     onChange={(e) => handleInputChange('weight', parseInt(e.target.value))}
                     disabled={!isEditing}
-                    min="0"
+                    min="30"
+                    max="200"
                   />
                 </div>
               </div>
@@ -299,17 +383,23 @@ const PersonalCabinet = () => {
                 <h3 className="text-lg font-semibold mb-4">Контактная информация</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="phone">Телефон</Label>
+                    <Label htmlFor="phone">Телефон*</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       disabled={!isEditing}
                     />
+                    {errors.phone && (
+                      <div className="flex items-center text-red-500 text-sm mt-1">
+                        <AlertCircle className="h-4 w-4 mr-1" />
+                        {errors.phone}
+                      </div>
+                    )}
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email*</Label>
                     <Input
                       id="email"
                       type="email"
@@ -317,6 +407,12 @@ const PersonalCabinet = () => {
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       disabled={!isEditing}
                     />
+                    {errors.email && (
+                      <div className="flex items-center text-red-500 text-sm mt-1">
+                        <AlertCircle className="h-4 w-4 mr-1" />
+                        {errors.email}
+                      </div>
+                    )}
                   </div>
 
                   <div>

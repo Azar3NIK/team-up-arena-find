@@ -158,25 +158,6 @@ const Dashboard = () => {
               </CardContent>
             </Link>
           </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <Link to="/about">
-              <CardHeader>
-                <CardTitle className="flex items-center text-xl">
-                  <Info className="h-6 w-6 text-sport-gray mr-3" />
-                  О нас
-                </CardTitle>
-                <CardDescription>
-                  Узнайте больше о платформе FindPlayer
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Подробнее
-                </Button>
-              </CardContent>
-            </Link>
-          </Card>
         </div>
       </div>
     </div>

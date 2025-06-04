@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Eye, EyeOff } from "lucide-react";
+import { Users, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -13,14 +12,50 @@ const Login = () => {
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Заглушка для проверки авторизации
+  const mockAuth = (email: string, password: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Проверяем "правильные" учетные данные
+        const isValid = 
+          email === "user@example.com" && 
+          password === "password123";
+        resolve(isValid);
+      }, 1000);
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement authentication logic
-    console.log("Login form submitted:", formData);
-    // Временно перенаправляем на дашборд
-    navigate("/dashboard");
+    setError("");
+    setIsLoading(true);
+
+    try {
+      // Проверяем заполнение полей
+      if (!formData.email || !formData.password) {
+        setError("Пожалуйста, заполните все поля");
+        return;
+      }
+
+      // Используем заглушку для авторизации
+      const isAuthenticated = await mockAuth(formData.email, formData.password);
+
+      if (isAuthenticated) {
+        console.log("Успешный вход:", formData.email);
+        navigate("/dashboard");
+      } else {
+        setError("Неверный email или пароль");
+      }
+    } catch (err) {
+      setError("Произошла ошибка при авторизации");
+      console.error("Auth error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +81,13 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md flex items-center">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -88,8 +130,12 @@ const Login = () => {
               </Link>
             </div>
             
-            <Button type="submit" className="w-full gradient-orange text-white hover:opacity-90">
-              Войти
+            <Button 
+              type="submit" 
+              className="w-full gradient-orange text-white hover:opacity-90"
+              disabled={isLoading}
+            >
+              {isLoading ? "Вход..." : "Войти"}
             </Button>
           </form>
           
