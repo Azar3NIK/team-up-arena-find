@@ -41,7 +41,7 @@ const mockTeamData = {
   },
   currentUser: {
     id: "user1",
-    role: "captain" // или "member"
+    role: "captain" // "member" или "captain"
   },
   members: [
     {

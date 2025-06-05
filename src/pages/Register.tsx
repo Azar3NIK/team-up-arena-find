@@ -21,33 +21,33 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Заглушка для регистрации
-  const mockRegister = async (userData: typeof formData): Promise<{ success: boolean; message?: string }> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Проверка на существующий email
-        if (userData.email === "user@example.com") {
-          resolve({ success: false, message: "Пользователь с таким email уже существует" });
-          return;
-        }
+  // // Заглушка для регистрации
+  // const mockRegister = async (userData: typeof formData): Promise<{ success: boolean; message?: string }> => {
+  //   return new Promise((resolve) => {
+  //     setTimeout(() => {
+  //       // Проверка на существующий email
+  //       if (userData.email === "user@example.com") {
+  //         resolve({ success: false, message: "Пользователь с таким email уже существует" });
+  //         return;
+  //       }
 
-        // Проверка совпадения паролей
-        if (userData.password !== userData.confirmPassword) {
-          resolve({ success: false, message: "Пароли не совпадают" });
-          return;
-        }
+  //       // Проверка совпадения паролей
+  //       if (userData.password !== userData.confirmPassword) {
+  //         resolve({ success: false, message: "Пароли не совпадают" });
+  //         return;
+  //       }
 
-        // Проверка сложности пароля
-        if (userData.password.length < 6) {
-          resolve({ success: false, message: "Пароль должен содержать минимум 6 символов" });
-          return;
-        }
+  //       // Проверка сложности пароля
+  //       if (userData.password.length < 6) {
+  //         resolve({ success: false, message: "Пароль должен содержать минимум 6 символов" });
+  //         return;
+  //       }
 
-        // Успешная регистрация
-        resolve({ success: true });
-      }, 1000);
-    });
-  };
+  //       // Успешная регистрация
+  //       resolve({ success: true });
+  //     }, 1000);
+  //   });
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,24 +68,67 @@ const Register = () => {
         return;
       }
 
-      // Используем заглушку для регистрации
-      const result = await mockRegister(formData);
+      // Проверка совпадения паролей (оставляем)
+      if (formData.password !== formData.confirmPassword) {
+      setError("Пароли не совпадают");
+      setIsLoading(false);
+      return;
+      }
 
-      if (result.success) {
+      // Проверка сложности пароля (оставляем)
+      if (formData.password.length < 6) {
+      setError("Пароль должен содержать минимум 6 символов");
+      setIsLoading(false);
+      return;
+      }
+
+      // --- Запрос к вашему ASP.NET бэкенду ---
+      const response = await fetch("https://localhost:7260/register", { // Укажите правильный URL вашего бэкенда
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      },
+       body: JSON.stringify({
+       Name: `${formData.firstName} ${formData.lastName}`, // Объединяем имя и фамилию
+       Email: formData.email,
+       Password: formData.password,
+       }),
+       });
+
+      // Используем заглушку для регистрации
+      //const result = await mockRegister(formData);
+      if (response.ok) {
         setSuccess("Регистрация прошла успешно! Перенаправляем...");
-        console.log("Успешная регистрация:", formData);
-        // Перенаправляем через 1.5 секунды
+        console.log("Успешная регистрация");
         setTimeout(() => navigate("/dashboard"), 1500);
       } else {
-        setError(result.message || "Произошла ошибка при регистрации");
+        const errorData = await response.json(); // ASP.NET Core API обычно возвращает JSON с ошибкой
+        setError(errorData.detail || errorData.message || "Произошла ошибка при регистрации");
+        // Если вы возвращаете Results.Conflict("Email уже зарегистрирован"),
+        // то в errorData.detail будет "Email уже зарегистрирован"
       }
     } catch (err) {
-      setError("Произошла ошибка при регистрации");
+      setError("Не удалось подключиться к серверу. Пожалуйста, попробуйте позже.");
       console.error("Registration error:", err);
     } finally {
       setIsLoading(false);
     }
   };
+  //     if (result.success) {
+  //       setSuccess("Регистрация прошла успешно! Перенаправляем...");
+  //       console.log("Успешная регистрация:", formData);
+  //       // Перенаправляем через 1.5 секунды
+  //       setTimeout(() => navigate("/dashboard"), 1500);
+  //     } else {
+  //       setError(result.message || "Произошла ошибка при регистрации");
+  //     }
+  //   } catch (err) {
+  //     setError("Произошла ошибка при регистрации");
+  //     console.error("Registration error:", err);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

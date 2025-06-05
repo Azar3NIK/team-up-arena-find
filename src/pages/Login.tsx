@@ -17,17 +17,17 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Заглушка для проверки авторизации
-  const mockAuth = (email: string, password: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Проверяем "правильные" учетные данные
-        const isValid = 
-          email === "user@example.com" && 
-          password === "password123";
-        resolve(isValid);
-      }, 1000);
-    });
-  };
+  // const mockAuth = (email: string, password: string): Promise<boolean> => {
+  //   return new Promise((resolve) => {
+  //     setTimeout(() => {
+  //       // Проверяем "правильные" учетные данные
+  //       const isValid = 
+  //         email === "user@example.com" && 
+  //         password === "password123";
+  //       resolve(isValid);
+  //     }, 1000);
+  //   });
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,28 +35,67 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Проверяем заполнение полей
+      // Проверяем заполнение полей (клиентская валидация)
       if (!formData.email || !formData.password) {
         setError("Пожалуйста, заполните все поля");
+        setIsLoading(false); // Важно сбросить isLoading
         return;
       }
 
-      // Используем заглушку для авторизации
-      const isAuthenticated = await mockAuth(formData.email, formData.password);
+      // --- Запрос к вашему ASP.NET бэкенду ---
+      const response = await fetch("https://localhost:7260/login", { //  HTTPS URL бэкенда
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Email: formData.email,
+          Password: formData.password,
+        }),
+        credentials: "include", // Позволяет браузеру отправлять и получать куки (включая HttpOnly)
+      });
 
-      if (isAuthenticated) {
-        console.log("Успешный вход:", formData.email);
-        navigate("/dashboard");
+      if (response.ok) {
+        // Бэкенд успешно установил куку. Перенаправляем пользователя.
+        console.log("Успешный вход!");
+        // Можно добавить сообщение об успехе, если хотите, но для входа часто сразу перенаправляют
+        // setSuccess("Вход выполнен успешно! Перенаправляем..."); 
+        setTimeout(() => navigate("/dashboard"), 500); // Небольшая задержка перед перенаправлением
       } else {
-        setError("Неверный email или пароль");
+        // Обработка ошибок с бэкенда
+        const errorData = await response.json(); // Ожидаем ProblemDetails JSON от ASP.NET Core
+        setError(errorData.detail || errorData.title || "Неверный email или пароль.");
       }
     } catch (err) {
-      setError("Произошла ошибка при авторизации");
-      console.error("Auth error:", err);
+      setError("Не удалось подключиться к серверу. Пожалуйста, проверьте ваше соединение или попробуйте позже.");
+      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
   };
+  //   try {
+  //     // Проверяем заполнение полей
+  //     if (!formData.email || !formData.password) {
+  //       setError("Пожалуйста, заполните все поля");
+  //       return;
+  //     }
+
+  //     // Используем заглушку для авторизации
+  //     const isAuthenticated = await mockAuth(formData.email, formData.password);
+
+  //     if (isAuthenticated) {
+  //       console.log("Успешный вход:", formData.email);
+  //       navigate("/dashboard");
+  //     } else {
+  //       setError("Неверный email или пароль");
+  //     }
+  //   } catch (err) {
+  //     setError("Произошла ошибка при авторизации");
+  //     console.error("Auth error:", err);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
