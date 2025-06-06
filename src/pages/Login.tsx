@@ -42,7 +42,7 @@ const Login = () => {
         return;
       }
 
-      // --- Запрос к вашему ASP.NET бэкенду ---
+      // --- Запрос к ASP.NET бэкенду ---
       const response = await fetch("https://localhost:7260/login", { //  HTTPS URL бэкенда
         method: "POST",
         headers: {
