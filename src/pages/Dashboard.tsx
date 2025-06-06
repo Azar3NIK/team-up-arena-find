@@ -52,7 +52,7 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <Link to="/profile">
+            <Link to="/personal-cabinet">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center text-lg">
                   <User className="h-5 w-5 text-sport-blue mr-2" />
