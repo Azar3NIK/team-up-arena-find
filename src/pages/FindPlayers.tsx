@@ -3,10 +3,11 @@ import { PlayerCard } from "@/components/PlayerCard";
 import { PlayerFilters } from "@/components/PlayerFilters";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+import { Filter, ArrowLeft } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast"; // Импортируем useToast
 import { playerProfileService, PlayerProfileBackendData, PlayerProfileFilterRequest } from "@/services/playerProfileService";
+import { useNavigate } from "react-router-dom";
 
 // Frontend interface для PlayerCard, чтобы отображать данные
 interface PlayerCardProps {
@@ -36,6 +37,7 @@ interface FrontendFiltersState {
 
 const FindPlayers = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState<FrontendFiltersState>({
     search: '',
@@ -167,6 +169,18 @@ const FindPlayers = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+       <div className="mb-6"> {/* Добавляем отступ снизу */}
+        <Button
+          variant="outline"
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Назад к панели
+        </Button>
+      </div>
+
+      {/* Заголовок и описание */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Поиск игроков</h1>
         <p className="text-gray-600">Найдите подходящих игроков для вашей команды</p>

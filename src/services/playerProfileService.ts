@@ -23,6 +23,7 @@ axiosInstance.interceptors.request.use(
 // PlayerProfileResponse.cs на бэкенде
 export interface PlayerProfileBackendData {
   id: string; // Guid в C# мапится в string в TS
+  userId: string;
   skillLevel?: number;
   location?: string;
   teamFindingStatus?: number;

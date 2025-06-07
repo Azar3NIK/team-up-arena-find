@@ -57,9 +57,9 @@ const Dashboard = () => {
               <Link to="/notifications">
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 bg-sport-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {/*<span className="absolute -top-1 -right-1 bg-sport-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     3
-                  </span>
+                  </span>*/}
                 </Button>
               </Link>
               <Link to="/profile">
@@ -110,9 +110,9 @@ const Dashboard = () => {
                 <CardTitle className="flex items-center text-lg">
                   <Bell className="h-5 w-5 text-sport-orange mr-2" />
                   Уведомления
-                  <span className="ml-2 bg-sport-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {/*<span className="ml-2 bg-sport-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     3
-                  </span>
+                  </span>*/}
                 </CardTitle>
               </CardHeader>
               <CardContent>

@@ -1,264 +1,281 @@
+// src/pages/PlayerProfile.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; 
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { ArrowLeft, MapPin, Star, Calendar, Trophy, Users, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Trophy, Users, MessageCircle, Loader2, ServerCrash } from "lucide-react"; // Иконки
+import { useToast } from "@/hooks/use-toast";
+import { playerProfileService, PlayerProfileBackendData } from "@/services/playerProfileService"; // сервис анкеты игрока
+import { invitationService } from "@/services/invitationService"; // Импортируем сервис приглашений
+import { teamService, TeamData } from "@/services/teamService"; // Импортируем сервис команд
 
-// Mock data для демонстрации
-const mockPlayerData = {
-  "1": {
-    id: "1",
-    name: "Александр Петров",
-    avatar: "/placeholder.svg",
-    position: "Нападающий",
-    rating: 4.5,
-    location: "Москва",
-    sport: "Футбол",
-    experience: "Любитель",
-    teamStatus: "looking",
-    age: 28,
-    height: 180,
-    weight: 75,
-    joinDate: "2023-06-15",
-    gamesPlayed: 45,
-    goals: 23,
-    assists: 12,
-    description: "Опытный нападающий с отличным чувством мяча. Играю в футбол уже 15 лет, участвовал в различных любительских турнирах. Ищу активную команду для участия в чемпионате города.",
-    achievements: [
-      "Лучший бомбардир турнира 2023",
-      "Победитель кубка любительских команд",
-      "Участник сборной района"
-    ],
-    availableTime: ["Понедельник 18:00-20:00", "Среда 19:00-21:00", "Суббота 10:00-12:00"],
-    contacts: {
-      phone: "+7 (999) 123-45-67",
-      email: "alexander.petrov@email.com",
-      telegram: "@alex_petrov"
+// Вспомогательные функции для маппинга данных (можно вынести в отдельный файл)
+const mapSkillLevelToExperience = (skillLevel?: number): string => {
+    switch (skillLevel) {
+        case 0: return "Новичок";
+        case 1: return "Любитель";
+        case 2: return "Полупрофессионал";
+        case 3: return "Профессионал";
+        default: return "Не указано";
     }
-  }
+};
+
+const mapTeamFindingStatusToFrontend = (status?: number): "looking" | "has-team" | "not-looking" => {
+    switch (status) {
+        case 0: return "looking";
+        case 1: return "has-team";
+        case 2: return "not-looking";
+        default: return "not-looking";
+    }
+};
+
+const getTeamStatusBadge = (status: "looking" | "has-team" | "not-looking") => {
+    switch (status) {
+        case 'looking': return <Badge className="bg-green-500 text-white">Ищет команду</Badge>;
+        case 'has-team': return <Badge variant="secondary">В команде</Badge>;
+        case 'not-looking': return <Badge variant="outline">Не ищет команду</Badge>;
+        default: return null;
+    }
 };
 
 const PlayerProfile = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>(); // Получаем id из URL
   const navigate = useNavigate();
-  const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const { toast } = useToast();
+  
+  const [player, setPlayer] = useState<PlayerProfileBackendData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
+  const [captainTeam, setCaptainTeam] = useState<TeamData | null>(null);
 
-  const player = mockPlayerData[id as keyof typeof mockPlayerData];
+  useEffect(() => {
+    if (!id) {
+      setError("ID игрока не найден в URL.");
+      setIsLoading(false);
+      return;
+    }
 
-  if (!player) {
+    const fetchPlayerProfile = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await playerProfileService.getProfileById(id);
+        setPlayer(data);
+      } catch (err) {
+        console.error("Ошибка при загрузке профиля игрока:", err);
+        setError("Не удалось загрузить профиль игрока. Возможно, он был удален или ссылка неверна.");
+        toast({
+          title: "Ошибка загрузки",
+          description: "Не удалось получить данные игрока.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+     const fetchCaptainTeam = async () => {
+        try {
+            const team = await teamService.getMyTeam();
+            // Мы предполагаем, что если команда есть, то текущий пользователь - ее капитан/участник.
+            // Бэкенд проверит права при отправке приглашения.
+            setCaptainTeam(team);
+        } catch (error) {
+            // Это не критичная ошибка, просто кнопка приглашения не будет работать
+            console.warn("Не удалось загрузить команду для приглашения:", error);
+        }
+    };
+
+    fetchCaptainTeam();
+
+    fetchPlayerProfile();
+  }, [id, toast]);
+
+    const handleInvitePlayer = async () => {
+
+    console.log("Проверка перед приглашением:", {
+            player: player,
+            captainTeam: captainTeam,
+            isPlayerMissing: !player,
+           isTeamMissing: !captainTeam,
+           isUserIdMissing: player ? !player.userId : true
+        });
+
+    if (!player || !captainTeam || !player.userId) {
+        toast({
+            title: "Невозможно пригласить",
+            description: "Отсутствуют данные игрока или вашей команды.",
+            variant: "destructive",
+        });
+        return;
+    }
+     setIsInviting(true);
+    try {
+        await invitationService.sendInvitation({
+            teamId: captainTeam.id,
+            invitedUserId: player.userId, // ID игрока, чей профиль мы смотрим
+        });
+
+        toast({
+            title: "Приглашение отправлено",
+            description: `Вы успешно пригласили ${player.fullName} в команду "${captainTeam.name}".`,
+        });
+
+    } catch (error: any) {
+        let errorMessage = "Произошла неизвестная ошибка при отправке приглашения.";
+    
+    // Проверяем, что это ошибка Axios и есть тело ответа
+    if (error.response && error.response.data) {
+        const responseData = error.response.data;
+        
+        // Если тело ответа - строка (как от ваших throw new InvalidOperationException), используем ее
+        if (typeof responseData === 'string') {
+            errorMessage = responseData;
+        } 
+        // Если тело ответа - объект ошибки .NET (как при 500), берем из него поле detail или title
+        else if (typeof responseData === 'object' && responseData.detail) {
+            errorMessage = responseData.detail;
+        }
+        else if (typeof responseData === 'object' && responseData.title) {
+            errorMessage = responseData.title;
+        }
+    }
+
+    toast({
+        title: "Ошибка",
+        description: errorMessage, // Теперь здесь всегда будет строка
+        variant: "destructive",
+    });
+    console.error(error); // Оставляем для полной отладки в консоли
+    } finally {
+        setIsInviting(false);
+    }
+  };
+  // Состояние загрузки
+  if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Игрок не найден</h1>
-          <Button onClick={() => navigate('/find-players')}>
-            Вернуться к поиску
-          </Button>
-        </div>
+      <div className="container mx-auto px-4 py-8 flex justify-center items-center h-[calc(100vh-200px)]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
 
-  const getTeamStatusBadge = (status: string) => {
-    switch (status) {
-      case 'looking':
-        return <Badge className="bg-green-500">Ищет команду</Badge>;
-      case 'has-team':
-        return <Badge variant="secondary">В команде</Badge>;
-      case 'not-looking':
-        return <Badge variant="outline">Не ищет команду</Badge>;
-      default:
-        return null;
-    }
-  };
+  // Состояние ошибки
+  if (error || !player) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <ServerCrash className="h-16 w-16 mx-auto text-destructive mb-4" />
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Произошла ошибка</h1>
+        <p className="text-gray-600 mb-6">{error || "Игрок не найден."}</p>
+        <Button onClick={() => navigate('/find-players')}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Вернуться к поиску
+        </Button>
+      </div>
+    );
+  }
 
-  const handleInviteToTeam = () => {
-    // Здесь будет логика приглашения в команду
-    setShowInviteDialog(true);
-    setTimeout(() => {
-      setShowInviteDialog(false);
-      alert("Приглашение отправлено!");
-    }, 1000);
-  };
-
+  // Состояние успешной загрузки
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Кнопка назад */}
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate('/find-players')}
-        className="mb-6"
-      >
+      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Назад к поиску
       </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Основная информация */}
-        <div className="lg:col-span-2">
-          <Card className="mb-6">
-            <CardHeader>
-              <div className="flex items-start space-x-4">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={player.avatar} alt={player.name} />
-                  <AvatarFallback className="text-lg">
-                    {player.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h1 className="text-3xl font-bold">{player.name}</h1>
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                      <span className="text-lg font-semibold">{player.rating}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-4 text-gray-600">
-                      <span>{player.position}</span>
-                      <span>•</span>
-                      <span>{player.age} лет</span>
-                      <span>•</span>
-                      <span>{player.height} см, {player.weight} кг</span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-1 text-gray-600">
-                      <MapPin className="h-4 w-4" />
-                      <span>{player.location}</span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-3 mt-3">
-                      <Badge variant="outline">{player.sport}</Badge>
-                      <Badge variant="outline">{player.experience}</Badge>
-                      {getTeamStatusBadge(player.teamStatus)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold mb-2">О себе</h3>
-                  <p className="text-gray-600">{player.description}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{player.gamesPlayed}</div>
-                    <div className="text-sm text-gray-600">Игр сыграно</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{player.goals}</div>
-                    <div className="text-sm text-gray-600">Голов</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">{player.assists}</div>
-                    <div className="text-sm text-gray-600">Передач</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">{player.achievements.length}</div>
-                    <div className="text-sm text-gray-600">Достижений</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Достижения */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Trophy className="h-5 w-5 mr-2" />
-                Достижения
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {player.achievements.map((achievement, index) => (
-                  <li key={index} className="flex items-center space-x-2">
-                    <Badge variant="outline" className="text-sm">
-                      {achievement}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Время для тренировок */}
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
-                Свободное время
-              </CardTitle>
+              <div className="flex items-start space-x-4">
+                <Avatar className="h-24 w-24 border">
+                  <AvatarImage src={player.photoUrl || undefined} alt={player.fullName} />
+                  <AvatarFallback className="text-3xl">
+                    {player.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold">{player.fullName}</h1>
+                  <div className="flex items-center space-x-1 text-gray-600 mt-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{player.location || "Местоположение не указано"}</span>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Badge variant="outline">{player.game || "Спорт не указан"}</Badge>
+                    <Badge variant="outline">{mapSkillLevelToExperience(player.skillLevel)}</Badge>
+                    {getTeamStatusBadge(mapTeamFindingStatusToFrontend(player.teamFindingStatus))}
+                  </div>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
-                {player.availableTime.map((time, index) => (
-                  <li key={index} className="text-gray-600">
-                    • {time}
-                  </li>
-                ))}
-              </ul>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="font-bold text-xl">{player.age || "-"}</div>
+                  <div className="text-sm text-gray-500">Возраст</div>
+                </div>
+                <div>
+                  <div className="font-bold text-xl">{player.playExperienceYears || "-"}</div>
+                  <div className="text-sm text-gray-500">Стаж (лет)</div>
+                </div>
+                <div>
+                  <div className="font-bold text-xl">{player.height || "-"} см</div>
+                  <div className="text-sm text-gray-500">Рост</div>
+                </div>
+                <div>
+                  <div className="font-bold text-xl">{player.weight || "-"} кг</div>
+                  <div className="text-sm text-gray-500">Вес</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>О себе</CardTitle></CardHeader>
+            <CardContent>
+              <p className="text-gray-700 whitespace-pre-wrap">
+                {player.aboutMe || "Игрок пока не добавил информацию о себе."}
+              </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Боковая панель */}
-        <div>
-          {/* Действия */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Действия</CardTitle>
-            </CardHeader>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader><CardTitle>Действия</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              {player.teamStatus === 'looking' && (
-                <Button 
-                  onClick={handleInviteToTeam} 
-                  className="w-full"
-                  disabled={showInviteDialog}
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  {showInviteDialog ? 'Отправляется...' : 'Пригласить в команду'}
-                </Button>
+              {captainTeam && player.teamFindingStatus === 0 && (
+              <Button 
+                className="w-full" 
+                onClick={handleInvitePlayer} 
+                disabled={isInviting}
+              >
+                {isInviting ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Отправка...</>
+                ) : (
+                  <><Users className="h-4 w-4 mr-2" /> Пригласить в команду</>
+                )}
+              </Button>
               )}
-              
               <Button variant="outline" className="w-full">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Написать сообщение
               </Button>
             </CardContent>
           </Card>
-
-          {/* Контакты */}
+          
           <Card>
-            <CardHeader>
-              <CardTitle>Контактная информация</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <Label className="text-sm font-medium">Телефон</Label>
-                <p className="text-gray-600">{player.contacts.phone}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium">Email</Label>
-                <p className="text-gray-600">{player.contacts.email}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium">Telegram</Label>
-                <p className="text-gray-600">{player.contacts.telegram}</p>
-              </div>
-              <div className="pt-2 text-xs text-gray-500">
-                Зарегистрирован: {new Date(player.joinDate).toLocaleDateString('ru-RU')}
-              </div>
+            <CardHeader><CardTitle>Контакты</CardTitle></CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <p><strong>Email:</strong> {player.email || "не указан"}</p>
+              <p><strong>Телефон:</strong> {player.phone || "не указан"}</p>
+              <p><strong>Telegram:</strong> {player.telegram || "не указан"}</p>
             </CardContent>
           </Card>
         </div>
