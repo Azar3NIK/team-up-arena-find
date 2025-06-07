@@ -7,10 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Save, User, AlertCircle, ArrowLeft } from "lucide-react";
+import { Camera, Save, User, AlertCircle, ArrowLeft, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { playerProfileService, PlayerProfileBackendData, UpdatePlayerProfileRequestData, axiosInstance } from "@/services/playerProfileService"; // Импортируем ваш сервис
 import { useNavigate } from "react-router-dom";
+import { authService } from "@/services/authService";
 
 // Определим тип для состояния профиля на фронтенде,
 // который будет более удобен для работы в UI
@@ -270,6 +271,25 @@ const PersonalCabinet = () => {
     setErrors({});
   };
 
+      const handleLogout = async () => {
+        try {
+            await authService.logout();
+            toast({
+                title: "Выход выполнен",
+                description: "Вы успешно вышли из своего аккаунта.",
+            });
+            // Перенаправляем на главную страницу или страницу входа
+            navigate("/"); 
+        } catch (error) {
+            // Эта ошибка будет вызвана, только если мы решим пробрасывать ее из сервиса
+            toast({
+                title: "Ошибка",
+                description: "Не удалось выполнить выход. Попробуйте снова.",
+                variant: "destructive",
+            });
+        }
+    };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 flex justify-center items-center h-64">
@@ -294,7 +314,7 @@ const PersonalCabinet = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Превью профиля */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Превью анкеты</CardTitle>
@@ -347,6 +367,24 @@ const PersonalCabinet = () => {
               </div>
             </CardContent>
           </Card>
+
+             {/* 3. Добавляем новую карточку "Действия" с кнопкой выхода */}
+            <Card>
+                 <CardHeader>
+                     <CardTitle>Действия</CardTitle>
+                </CardHeader>
+                 <CardContent>
+                     <Button 
+                        variant="outline" 
+                         className="w-full text-destructive hover:text-destructive hover:bg-red-50"
+                         onClick={handleLogout}
+                     >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Выйти из аккаунта
+                    </Button>
+                </CardContent>
+            </Card>
+
         </div>
 
         {/* Форма редактирования */}
