@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Search, Users, User } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,25 +21,26 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
+            <Link to="/register" className="text-gray-600 hover:text-sport-blue transition-colors">
               Найти команду
-            </a>
-            <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
+            </Link>
+            <Link to="/register" className="text-gray-600 hover:text-sport-blue transition-colors">
               Найти игроков
-            </a>
-            <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
-              О нас
-            </a>
+            </Link>
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="text-gray-600">
-              Войти
-            </Button>
-            <Button size="sm" className="gradient-orange text-white border-0 hover:opacity-90">
-              Регистрация
-            </Button>
+            <Link to="/login">
+              <Button variant="ghost" size="sm" className="text-gray-600">
+                Войти
+              </Button>
+            </Link>
+            <Link to="/register">
+              <Button size="sm" className="gradient-orange text-white border-0 hover:opacity-90">
+                Регистрация
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -54,22 +56,23 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 animate-slide-up">
             <div className="flex flex-col space-y-4">
-              <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
+              <Link to="/register" className="text-gray-600 hover:text-sport-blue transition-colors">
                 Найти команду
-              </a>
-              <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
+              </Link>
+              <Link to="/register" className="text-gray-600 hover:text-sport-blue transition-colors">
                 Найти игроков
-              </a>
-              <a href="#" className="text-gray-600 hover:text-sport-blue transition-colors">
-                О нас
-              </a>
+              </Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
-                <Button variant="ghost" size="sm" className="justify-start">
-                  Войти
-                </Button>
-                <Button size="sm" className="gradient-orange text-white border-0 hover:opacity-90">
-                  Регистрация
-                </Button>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm" className="justify-start w-full">
+                    Войти
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button size="sm" className="gradient-orange text-white border-0 hover:opacity-90 w-full">
+                    Регистрация
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
