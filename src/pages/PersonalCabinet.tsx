@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { playerProfileService, PlayerProfileBackendData, UpdatePlayerProfileRequestData, axiosInstance } from "@/services/playerProfileService"; // Импортируем ваш сервис
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
+import { useAuth } from '@/context/AuthContext';
 
 // Определим тип для состояния профиля на фронтенде,
 // который будет более удобен для работы в UI
@@ -37,6 +38,7 @@ interface PlayerProfileFrontendState {
 const PersonalCabinet = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // !!! ВАЖНО: Этот ID должен быть получен из контекста аутентификации пользователя!
   // Например, если пользователь залогинен, у него есть свой ID профиля.
@@ -271,24 +273,25 @@ const PersonalCabinet = () => {
     setErrors({});
   };
 
-      const handleLogout = async () => {
-        try {
-            await authService.logout();
-            toast({
-                title: "Выход выполнен",
-                description: "Вы успешно вышли из своего аккаунта.",
-            });
-            // Перенаправляем на главную страницу или страницу входа
-            navigate("/"); 
-        } catch (error) {
-            // Эта ошибка будет вызвана, только если мы решим пробрасывать ее из сервиса
-            toast({
-                title: "Ошибка",
-                description: "Не удалось выполнить выход. Попробуйте снова.",
-                variant: "destructive",
-            });
-        }
-    };
+  const handleLogout = async () => {
+    try {
+        await authService.logout();
+        logout(); 
+        toast({
+            title: "Выход выполнен",
+            description: "Вы успешно вышли из своего аккаунта.",
+        });
+        // Перенаправляем на главную страницу или страницу входа
+         navigate("/"); 
+    } catch (error) {
+         // Эта ошибка будет вызвана, только если мы решим пробрасывать ее из сервиса
+         toast({
+            title: "Ошибка",
+             description: "Не удалось выполнить выход. Попробуйте снова.",
+             variant: "destructive",
+        });
+    }
+  };
 
   if (isLoading) {
     return (

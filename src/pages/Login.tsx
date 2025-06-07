@@ -5,8 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '@/context/AuthContext';
 
 const Login = () => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -15,19 +17,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Заглушка для проверки авторизации
-  // const mockAuth = (email: string, password: string): Promise<boolean> => {
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       // Проверяем "правильные" учетные данные
-  //       const isValid = 
-  //         email === "user@example.com" && 
-  //         password === "password123";
-  //       resolve(isValid);
-  //     }, 1000);
-  //   });
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,9 +46,10 @@ const Login = () => {
 
       if (response.ok) {
         // Бэкенд успешно установил куку. Перенаправляем пользователя.
-        console.log("Успешный вход!");
-        // Можно добавить сообщение об успехе, если хотите, но для входа часто сразу перенаправляют
-        // setSuccess("Вход выполнен успешно! Перенаправляем..."); 
+        const userInfo = await response.json(); // Ожидаем { id, userName, email }
+        login(userInfo);
+
+        console.log("Успешный вход, данные пользователя сохранены:", userInfo);
         setTimeout(() => navigate("/dashboard"), 500); // Небольшая задержка перед перенаправлением
       } else {
         // Обработка ошибок с бэкенда
@@ -73,29 +63,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  //   try {
-  //     // Проверяем заполнение полей
-  //     if (!formData.email || !formData.password) {
-  //       setError("Пожалуйста, заполните все поля");
-  //       return;
-  //     }
-
-  //     // Используем заглушку для авторизации
-  //     const isAuthenticated = await mockAuth(formData.email, formData.password);
-
-  //     if (isAuthenticated) {
-  //       console.log("Успешный вход:", formData.email);
-  //       navigate("/dashboard");
-  //     } else {
-  //       setError("Неверный email или пароль");
-  //     }
-  //   } catch (err) {
-  //     setError("Произошла ошибка при авторизации");
-  //     console.error("Auth error:", err);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

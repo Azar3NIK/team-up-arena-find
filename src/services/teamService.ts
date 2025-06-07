@@ -74,4 +74,31 @@ export const teamService = {
       throw error;
     }
   },
+  /**
+   * Покинуть команду (для обычного участника).
+   */
+  leaveTeam: async (): Promise<string> => {
+    try {
+      const response = await axiosInstance.post<string>(`${API_BASE_URL}/leave`);
+      return response.data;
+    } catch (error) {
+      console.error("Ошибка при выходе из команды:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Исключить участника из команды (для капитана).
+   * @param teamId ID команды.
+   * @param memberId ID участника для исключения.
+   */
+  removeMember: async (teamId: string, memberId: string): Promise<string> => {
+    try {
+      const response = await axiosInstance.post<string>(`${API_BASE_URL}/${teamId}/remove-member/${memberId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Ошибка при исключении участника:", error);
+      throw error;
+    }
+  },
 };
