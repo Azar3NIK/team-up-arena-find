@@ -9,16 +9,9 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// ... ваш интерсептор request (хотя для кук он не так критичен, но не помешает)
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Если вы НЕ используете JWT в заголовке Authorization (только куки),
-    // то эта часть кода с token из localStorage не нужна.
-    // Если используете комбинацию или переключаетесь, то оставьте.
-    // const token = localStorage.getItem('jwt_token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+
     return config;
   },
   (error) => {
@@ -69,6 +62,18 @@ export interface UpdatePlayerProfileRequestData {
   telegram?: string;
 }
 
+// интерфейс для параметров фильтрации, соответствует PlayerProfileFilterRequest на бэкенде
+export interface PlayerProfileFilterRequest {
+    skillLevel?: number;
+    location?: string;
+    teamFindingStatus?: number;
+    game?: string;
+    playExperienceYears?: number;
+    age?: number;
+    fullName?: string; // Для поиска по имени
+    gender?: string;
+}
+
 export const playerProfileService = {
   /**
    * Получает профиль игрока по его ID.
@@ -100,16 +105,17 @@ export const playerProfileService = {
     }
   },
 
-  // Если вам понадобится поиск, можно добавить:
-  /*
+   /**
+   * Ищет профили игроков по заданным фильтрам.
+   * @param filters Объект с параметрами фильтрации.
+   */
   searchProfiles: async (filters: PlayerProfileFilterRequest): Promise<PlayerProfileBackendData[]> => {
     try {
-      const response = await axios.get<PlayerProfileBackendData[]>(`${API_BASE_URL}/search`, { params: filters });
+      const response = await axiosInstance.get<PlayerProfileBackendData[]>(`${API_BASE_URL}/search`, { params: filters });
       return response.data;
     } catch (error) {
       console.error('Ошибка при поиске профилей игроков:', error);
       throw error;
     }
   }
-  */
 };
