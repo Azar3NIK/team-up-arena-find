@@ -1,13 +1,48 @@
+// --- Файл: Dashboard.tsx ---
 
+import { useState } from "react"; // Добавляем импорт
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Bell, Calendar, User, Search, UserPlus, Info } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Users, Bell, Calendar, User, Search, UserPlus, Info, Loader2 } from "lucide-react"; // Добавляем Loader2
+import { Link, useNavigate } from "react-router-dom"; // Добавляем useNavigate
+import { useToast } from "@/hooks/use-toast"; // Добавляем useToast
+import { teamService } from "@/services/teamService"; // Импортируем наш новый сервис
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isTeamLoading, setIsTeamLoading] = useState(false);
+
+  const handleMyTeamClick = async () => {
+    setIsTeamLoading(true);
+    try {
+      // Вызываем метод сервиса для проверки наличия команды
+      const team = await teamService.getMyTeam();
+
+      if (team) {
+        // Если команда есть, переходим на страницу команды
+        navigate("/my-team");
+      } else {
+        // Если команды нет (сервис вернул null), переходим на страницу создания
+        navigate("/create-team");
+      }
+    } catch (error) {
+      // Обрабатываем непредвиденные ошибки
+      toast({
+        title: "Ошибка",
+        description: "Не удалось проверить информацию о команде. Попробуйте снова.",
+        variant: "destructive",
+      });
+      console.error(error);
+    } finally {
+      setIsTeamLoading(false);
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* ... остальная часть хедера ... */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -40,6 +75,7 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
+        {/* ... остальная часть ... */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-sport-navy mb-2">
             Добро пожаловать, Игрок!
@@ -51,6 +87,7 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* ... Другие карточки ... */}
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <Link to="/personal-cabinet">
               <CardHeader className="pb-3">
@@ -101,12 +138,19 @@ const Dashboard = () => {
               </CardContent>
             </Link>
           </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <Link to="/my-team">
+          
+          {/* ИЗМЕНЕННАЯ КАРТОЧКА "МОЯ КОМАНДА" */}
+          <Card 
+            className="hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={!isTeamLoading ? handleMyTeamClick : undefined}
+          >
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center text-lg">
-                  <Users className="h-5 w-5 text-sport-navy mr-2" />
+                  {isTeamLoading ? (
+                    <Loader2 className="h-5 w-5 text-sport-navy mr-2 animate-spin" />
+                  ) : (
+                    <Users className="h-5 w-5 text-sport-navy mr-2" />
+                  )}
                   Моя команда
                 </CardTitle>
               </CardHeader>
@@ -115,11 +159,10 @@ const Dashboard = () => {
                   Управление командой и составом
                 </CardDescription>
               </CardContent>
-            </Link>
           </Card>
         </div>
 
-        {/* Main Navigation */}
+        {/* ... остальная часть компонента ... */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <Link to="/find-team">
