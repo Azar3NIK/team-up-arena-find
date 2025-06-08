@@ -165,7 +165,7 @@ const Dashboard = () => {
         {/* ... остальная часть компонента ... */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <Link to="/find-team">
+            <Link to="/find-teams">
               <CardHeader>
                 <CardTitle className="flex items-center text-xl">
                   <Search className="h-6 w-6 text-sport-blue mr-3" />

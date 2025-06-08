@@ -8,6 +8,12 @@ export const axiosInstance = axios.create({
 
 const API_BASE_URL = 'https://localhost:7260/team'; // Убедитесь, что порт верный
 
+export interface MemberData {
+  id: string;
+  userName: string;
+  email: string;
+}
+
 // Интерфейс для ответа от эндпоинта /team/my или /team/{id}
 // Соответствует вашему TeamResponse.cs
 export interface TeamData {
@@ -16,15 +22,19 @@ export interface TeamData {
   sportType: string;
   logoUrl: string | null;
   creationYear: number;
-  teamSkillLevel: number; // 0: Новичок, 1: Любитель, 2: Полупроф, 3: Проф
+  teamSkillLevel: number | null; // 0: Новичок, 1: Любитель, 2: Полупроф, 3: Проф
   aboutTeam: string;
   ownerUserId: string;
   ownerUserName: string;
-  members: {
-    id: string;
-    userName: string;
-    email: string;
-  }[];
+  membersCount: number;
+  members: MemberData[];
+}
+
+// Интерфейс для фильтров, отправляемых на бэкенд
+export interface TeamSearchFilters {
+  name?: string;
+  sportType?: string;
+  skillLevel?: number;
 }
 
 // Интерфейс для создания команды
@@ -98,6 +108,31 @@ export const teamService = {
       return response.data;
     } catch (error) {
       console.error("Ошибка при исключении участника:", error);
+      throw error;
+    }
+  },
+  searchTeams: async (filters: TeamSearchFilters): Promise<TeamData[]> => {
+    try {
+      const response = await axiosInstance.get<TeamData[]>(`${API_BASE_URL}/search`, {
+        params: filters
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Ошибка при поиске команд:", error);
+      throw error;
+    }
+  },
+
+   /**
+   * Получает детальную информацию о команде по ее ID.
+   * @param id ID команды.
+   */
+  getTeamById: async (id: string): Promise<TeamData> => {
+    try {
+      const response = await axiosInstance.get<TeamData>(`${API_BASE_URL}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Ошибка при получении команды с ID ${id}:`, error);
       throw error;
     }
   },

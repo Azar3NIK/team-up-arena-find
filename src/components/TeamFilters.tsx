@@ -1,76 +1,80 @@
+// src/components/TeamFilters.tsx
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "./ui/button";
+import { SlidersHorizontal } from "lucide-react";
+
+// 1. Определяем новый интерфейс для пропсов, который будет соответствовать FindTeams.tsx
+interface FiltersState {
+  name: string;
+  sportType: string;
+  skillLevel: string;
+}
 
 interface TeamFiltersProps {
-  filters: {
-    search: string;
-    sport: string;
-    location: string;
-    level: string;
-    foundedYear: string;
-  };
-  onFiltersChange: (filters: any) => void;
+  filters: FiltersState;
+  onFiltersChange: (newFilters: FiltersState) => void;
 }
 
 export const TeamFilters = ({ filters, onFiltersChange }: TeamFiltersProps) => {
-  const updateFilter = (key: string, value: any) => {
-    onFiltersChange({ ...filters, [key]: value });
+  // 2. Создаем обработчик для всех полей ввода
+  const handleInputChange = (field: keyof FiltersState, value: string) => {
+    onFiltersChange({ ...filters, [field]: value });
   };
 
-  const resetFilters = () => {
+  const handleReset = () => {
     onFiltersChange({
-      search: '',
-      sport: '',
-      location: '',
-      level: '',
-      foundedYear: ''
+      name: '',
+      sportType: '',
+      skillLevel: 'all'
     });
-  };
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Фильтры поиска команд</CardTitle>
+        <CardTitle className="flex items-center text-lg">
+          <SlidersHorizontal className="h-5 w-5 mr-2" />
+          Фильтры
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="search">Название команды</Label>
+        {/* 3. Обновляем поля, чтобы они соответствовали новому состоянию filters */}
+        
+        {/* Поиск по названию */}
+        <div className="space-y-2">
+          <Label htmlFor="name">Название команды</Label>
           <Input
-            id="search"
-            placeholder="Введите название команды"
-            value={filters.search}
-            onChange={(e) => updateFilter('search', e.target.value)}
+            id="name"
+            placeholder="Например: Спартак"
+            value={filters.name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
           />
         </div>
 
-        <div>
-          <Label>Вид спорта</Label>
+        {/* Фильтр по виду спорта */}
+        <div className="space-y-2">
+          <Label htmlFor="sportType">Вид спорта</Label>
           <Input
-            placeholder="Введите вид спорта"
-            value={filters.sport}
-            onChange={(e) => updateFilter('sport', e.target.value)}
+            id="sportType"
+            placeholder="Например: Футбол"
+            value={filters.sportType}
+            onChange={(e) => handleInputChange('sportType', e.target.value)}
           />
         </div>
 
-        <div>
-          <Label>Местоположение</Label>
-          <Input
-            placeholder="Введите город"
-            value={filters.location}
-            onChange={(e) => updateFilter('location', e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label>Уровень подготовки команды</Label>
-          <Select value={filters.level} onValueChange={(value) => updateFilter('level', value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Выберите уровень" />
+        {/* Фильтр по уровню */}
+        <div className="space-y-2">
+          <Label htmlFor="skillLevel">Уровень</Label>
+          <Select
+            value={filters.skillLevel}
+            onValueChange={(value) => handleInputChange('skillLevel', value)}
+          >
+            <SelectTrigger id="skillLevel">
+              <SelectValue placeholder="Любой уровень" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Любой уровень</SelectItem>
@@ -81,22 +85,13 @@ export const TeamFilters = ({ filters, onFiltersChange }: TeamFiltersProps) => {
             </SelectContent>
           </Select>
         </div>
-
-        <div>
-          <Label>Год создания команды</Label>
-          <Input
-            type="number"
-            placeholder="Введите год"
-            value={filters.foundedYear}
-            onChange={(e) => updateFilter('foundedYear', e.target.value)}
-            min="1900"
-            max={new Date().getFullYear()}
-          />
+        
+        {/* Кнопка сброса */}
+        <div className="pt-2">
+            <Button variant="ghost" className="w-full" onClick={handleReset}>
+                Сбросить фильтры
+            </Button>
         </div>
-
-        <Button variant="outline" onClick={resetFilters} className="w-full">
-          Сбросить фильтры
-        </Button>
       </CardContent>
     </Card>
   );
