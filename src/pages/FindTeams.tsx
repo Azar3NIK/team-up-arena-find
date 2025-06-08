@@ -5,10 +5,11 @@ import { TeamCard } from "@/components/TeamCard";
 import { TeamFilters } from "@/components/TeamFilters";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { Filter, Loader2, SearchX } from "lucide-react";
+import { Filter, Loader2, SearchX, ArrowLeft } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { teamService, TeamData, TeamSearchFilters } from "@/services/teamService";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 // Вспомогательные функции для маппинга
 const mapLevelToNumber = (level: string): number | undefined => {
@@ -39,6 +40,7 @@ interface FiltersState {
 
 const FindTeams = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<FiltersState>({
     name: '',
     sportType: '',
@@ -88,6 +90,18 @@ const FindTeams = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <Button
+          variant="outline"
+          onClick={() => navigate('/dashboard')}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          К дашборду
+        </Button>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Поиск команд</h1>
+        <p className="text-gray-600">Найдите подходящую команду для участия</p>
+      </div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Поиск команд</h1>
         <p className="text-gray-600">Найдите подходящую команду для участия</p>

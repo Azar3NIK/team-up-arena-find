@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { Calendar, Clock, MapPin, Plus, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Calendar, Clock, MapPin, Plus, CheckCircle, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -168,17 +168,27 @@ const Trainings = () => {
   // Основной рендер компонента
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+       <div className="flex justify-between items-start mb-6 gap-4">
         <div>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            К дашборду
+          </Button>
           <h1 className="text-3xl font-bold">Тренировки</h1>
           <p className="text-gray-600 mt-2">
             Управляйте тренировками вашей команды
           </p>
         </div>
-        <Button onClick={() => navigate('/create-training')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Создать тренировку
-        </Button>
+        <div className="flex-shrink-0 mt-[60px]"> {/* Добавляем отступ, чтобы кнопка была на одном уровне с описанием */}
+            <Button onClick={() => navigate('/create-training')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Создать тренировку
+            </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="active" className="w-full">

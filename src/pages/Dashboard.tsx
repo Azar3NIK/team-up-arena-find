@@ -62,7 +62,7 @@ const Dashboard = () => {
                   </span>*/}
                 </Button>
               </Link>
-              <Link to="/profile">
+              <Link to="/personal-cabinet">
                 <Button variant="ghost" size="sm">
                   <User className="h-5 w-5 mr-2" />
                   Профиль
@@ -98,7 +98,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Редактируйте профиль и настройки
+                  Редактируйте профиль
                 </CardDescription>
               </CardContent>
             </Link>
@@ -124,7 +124,7 @@ const Dashboard = () => {
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <Link to="/training">
+            <Link to="/trainings">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center text-lg">
                   <Calendar className="h-5 w-5 text-sport-green mr-2" />
@@ -139,7 +139,7 @@ const Dashboard = () => {
             </Link>
           </Card>
           
-          {/* ИЗМЕНЕННАЯ КАРТОЧКА "МОЯ КОМАНДА" */}
+          {/* КАРТОЧКА "МОЯ КОМАНДА" */}
           <Card 
             className="hover:shadow-lg transition-shadow cursor-pointer"
             onClick={!isTeamLoading ? handleMyTeamClick : undefined}
@@ -156,7 +156,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Управление командой и составом
+                  Информация о команде
                 </CardDescription>
               </CardContent>
           </Card>
@@ -172,7 +172,7 @@ const Dashboard = () => {
                   Найти команду
                 </CardTitle>
                 <CardDescription>
-                  Ищите команды по виду спорта, уровню и местоположению
+                  Ищите команды по при помощи фильтров
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -191,7 +191,7 @@ const Dashboard = () => {
                   Найти игроков
                 </CardTitle>
                 <CardDescription>
-                  Найдите игроков для своей команды по навыкам и позициям
+                  Найдите игроков для своей команды при помощи фильтров
                 </CardDescription>
               </CardHeader>
               <CardContent>
