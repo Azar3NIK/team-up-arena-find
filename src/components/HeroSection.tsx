@@ -2,10 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Search, Users } from "lucide-react";
 const HeroSection = () => {
   return <section className="relative overflow-hidden">
-      {/* Background Gradient */}
+      
       <div className="absolute inset-0 gradient-sport"></div>
       
-      {/* Content */}
       <div className="relative container mx-auto px-4 py-20 lg:py-32">
         <div className="text-center text-white">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
@@ -31,7 +30,6 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Wave Decoration */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1200 120" className="w-full h-12 md:h-20 text-white">
           <path d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" fill="currentColor"></path>

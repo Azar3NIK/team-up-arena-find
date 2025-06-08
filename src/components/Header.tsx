@@ -11,7 +11,6 @@ const Header = () => {
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 gradient-sport rounded-lg flex items-center justify-center">
               <Users className="h-5 w-5 text-white" />
@@ -19,7 +18,6 @@ const Header = () => {
             <span className="text-xl font-bold text-sport-navy">FindPlayer</span>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/register" className="text-gray-600 hover:text-sport-blue transition-colors">
               Найти команду
@@ -29,7 +27,7 @@ const Header = () => {
             </Link>
           </nav>
 
-          {/* Desktop Actions */}
+          
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login">
               <Button variant="ghost" size="sm" className="text-gray-600">
@@ -43,7 +41,6 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 text-gray-600 hover:text-sport-blue transition-colors"
@@ -52,7 +49,6 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 animate-slide-up">
             <div className="flex flex-col space-y-4">

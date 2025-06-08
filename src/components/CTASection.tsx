@@ -11,7 +11,7 @@ const CTASection = () => {
           </h2>
           
           <p className="text-xl md:text-2xl mb-8 opacity-90 animate-slide-up">
-            Присоединяйтесь к тысячам спортсменов, которые уже нашли своих партнеров для игры
+            Присоединяйтесь к спортсменам, которые уже нашли своих партнеров для игры
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12 animate-slide-up">

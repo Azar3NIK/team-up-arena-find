@@ -20,7 +20,6 @@ interface TeamCardProps {
 
 export const TeamCard = ({ team }: TeamCardProps) => {
   return (
-    // Оборачиваем всю карточку в Link
     <Link to={`/team/${team.id}`} className="block hover:shadow-lg transition-shadow rounded-lg h-full">
       <Card className="flex flex-col h-full">
         <CardHeader>
