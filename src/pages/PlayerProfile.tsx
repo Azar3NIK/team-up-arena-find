@@ -1,4 +1,4 @@
-// src/pages/PlayerProfile.tsx
+// PlayerProfile.tsx
 
 import { useState, useEffect } from "react"; 
 import { useParams, useNavigate } from "react-router-dom";
@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Trophy, Users, MessageCircle, Loader2, ServerCrash } from "lucide-react"; // Иконки
 import { useToast } from "@/hooks/use-toast";
 import { playerProfileService, PlayerProfileBackendData } from "@/services/playerProfileService"; // сервис анкеты игрока
-import { invitationService } from "@/services/invitationService"; // Импортируем сервис приглашений
-import { teamService, TeamData } from "@/services/teamService"; // Импортируем сервис команд
+import { invitationService } from "@/services/invitationService"; 
+import { teamService, TeamData } from "@/services/teamService"; 
 
-// Вспомогательные функции для маппинга данных (можно вынести в отдельный файл)
+// Вспомогательные функции для маппинга данных 
 const mapSkillLevelToExperience = (skillLevel?: number): string => {
     switch (skillLevel) {
         case 0: return "Новичок";
@@ -81,11 +81,10 @@ const PlayerProfile = () => {
      const fetchCaptainTeam = async () => {
         try {
             const team = await teamService.getMyTeam();
-            // Мы предполагаем, что если команда есть, то текущий пользователь - ее капитан/участник.
-            // Бэкенд проверит права при отправке приглашения.
+
             setCaptainTeam(team);
         } catch (error) {
-            // Это не критичная ошибка, просто кнопка приглашения не будет работать
+            
             console.warn("Не удалось загрузить команду для приглашения:", error);
         }
     };
@@ -147,10 +146,10 @@ const PlayerProfile = () => {
 
     toast({
         title: "Ошибка",
-        description: errorMessage, // Теперь здесь всегда будет строка
+        description: errorMessage, 
         variant: "destructive",
     });
-    console.error(error); // Оставляем для полной отладки в консоли
+    console.error(error); 
     } finally {
         setIsInviting(false);
     }

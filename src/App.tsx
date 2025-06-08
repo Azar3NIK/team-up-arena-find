@@ -43,7 +43,7 @@ const App = () => (
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/my-team" element={<MyTeam />} />
           <Route path="/create-team" element={<CreateTeam />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+  
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

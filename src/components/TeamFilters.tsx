@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { SlidersHorizontal } from "lucide-react";
 
-// 1. Определяем новый интерфейс для пропсов, который будет соответствовать FindTeams.tsx
+// интерфейс для пропсов, который соответствует FindTeams.tsx
 interface FiltersState {
   name: string;
   sportType: string;
@@ -20,7 +20,7 @@ interface TeamFiltersProps {
 }
 
 export const TeamFilters = ({ filters, onFiltersChange }: TeamFiltersProps) => {
-  // 2. Создаем обработчик для всех полей ввода
+  // обработчик для всех полей ввода
   const handleInputChange = (field: keyof FiltersState, value: string) => {
     onFiltersChange({ ...filters, [field]: value });
   };
@@ -42,7 +42,6 @@ export const TeamFilters = ({ filters, onFiltersChange }: TeamFiltersProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* 3. Обновляем поля, чтобы они соответствовали новому состоянию filters */}
         
         {/* Поиск по названию */}
         <div className="space-y-2">

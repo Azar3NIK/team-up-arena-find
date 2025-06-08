@@ -5,7 +5,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Button } from "@/components/ui/button";
 import { Filter, ArrowLeft } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useToast } from "@/hooks/use-toast"; // Импортируем useToast
+import { useToast } from "@/hooks/use-toast";
 import { playerProfileService, PlayerProfileBackendData, PlayerProfileFilterRequest } from "@/services/playerProfileService";
 import { useNavigate } from "react-router-dom";
 
@@ -89,10 +89,7 @@ const FindPlayers = () => {
   };
 
   const mapTeamStatusToBackend = (statusArray: string[]): number | undefined => {
-    // Для вашей текущей реализации бэкенда, которая принимает одно значение для teamFindingStatus,
-    // мы возьмем только первый выбранный статус или undefined, если массив пуст.
-    // Если ваш бэкенд будет поддерживать фильтрацию по нескольким статусам,
-    // то потребуется изменить логику здесь и на бэкенде.
+ 
     if (statusArray.length === 0) {
         return undefined;
     }

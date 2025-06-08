@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Gamepad2, Users } from "lucide-react";
-import { Link } from "react-router-dom"; // 1. Импортируем Link
+import { Link } from "react-router-dom"; 
 
 // Тип пропсов для карточки
 interface PlayerCardProps {
@@ -30,7 +30,7 @@ const getTeamStatusBadge = (status: "looking" | "has-team" | "not-looking") => {
 
 export const PlayerCard = ({ player }: PlayerCardProps) => {
   return (
-    // 2. Оборачиваем Card в Link, который ведет на страницу профиля
+    // Оборачиваем Card в Link, который ведет на страницу профиля
     <Link to={`/player/${player.id}`} className="block hover:shadow-lg transition-shadow rounded-lg">
       <Card className="h-full">
         <CardHeader>

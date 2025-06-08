@@ -11,11 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Users, Loader2 } from "lucide-react"; // Добавили Loader2
+import { ArrowLeft, Users, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { teamService, CreateTeamData } from "@/services/teamService"; // Импортируем наш сервис
+import { teamService, CreateTeamData } from "@/services/teamService";
 
-// 1. Создаем схему валидации, которая соответствует модели на бэкенде
+// Создаем схему валидации, которая соответствует модели на бэкенде
 const createTeamSchema = z.object({
   name: z.string().min(3, "Название должно содержать минимум 3 символа."),
   sportType: z.string().min(2, "Укажите вид спорта."),
@@ -27,7 +27,7 @@ const createTeamSchema = z.object({
   aboutTeam: z.string().max(500, "Описание не должно превышать 500 символов.").optional(),
 });
 
-// 2. Создаем тип для данных формы из схемы
+// Создаем тип для данных формы из схемы
 type CreateTeamFormData = z.infer<typeof createTeamSchema>;
 
 // Вспомогательная функция для маппинга уровня команды из строки в число
@@ -46,7 +46,7 @@ const CreateTeam = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  // 3. Настраиваем форму с валидацией
+  // Настраиваем форму с валидацией
   const form = useForm<CreateTeamFormData>({
     resolver: zodResolver(createTeamSchema),
     defaultValues: {
@@ -58,7 +58,7 @@ const CreateTeam = () => {
     },
   });
 
-  // 4. Реализуем отправку данных на бэкенд
+  // Реализуем отправку данных на бэкенд
   const onSubmit = async (data: CreateTeamFormData) => {
     setIsLoading(true);
     
@@ -70,7 +70,7 @@ const CreateTeam = () => {
         creationYear: data.creationYear,
         teamSkillLevel: mapLevelToNumber(data.teamSkillLevel), // Преобразуем строковый уровень в числовой
         aboutTeam: data.aboutTeam || "",
-        logoUrl: null, // Загрузку логотипа пока не реализуем
+        logoUrl: null, 
       };
 
       // Вызываем сервис для создания команды

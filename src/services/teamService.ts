@@ -1,12 +1,12 @@
 // src/services/teamService.ts
 import axios from 'axios';
 
-// Используем тот же экземпляр axios, что и в других сервисах, чтобы сохранить куки
+
 export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-const API_BASE_URL = 'https://localhost:7260/team'; // Убедитесь, что порт верный
+const API_BASE_URL = 'https://localhost:7260/team'; 
 
 export interface MemberData {
   id: string;
@@ -15,7 +15,7 @@ export interface MemberData {
 }
 
 // Интерфейс для ответа от эндпоинта /team/my или /team/{id}
-// Соответствует вашему TeamResponse.cs
+// Соответствует TeamResponse.cs
 export interface TeamData {
   id: string;
   name: string;
@@ -64,7 +64,6 @@ export const teamService = {
         // 404 означает, что команда не найдена, это ожидаемое поведение
         return null;
       }
-      // Все остальные ошибки (500, 401 и т.д.) считаем реальными проблемами
       console.error("Ошибка при получении данных о команде:", error);
       throw error;
     }

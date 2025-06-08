@@ -1,4 +1,4 @@
-// src/components/TeamCard.tsx
+// TeamCard.tsx
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

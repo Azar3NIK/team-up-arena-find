@@ -51,7 +51,6 @@ const Trainings = () => {
   const handleCompleteTraining = async (trainingId: string) => {
     try {
       await trainingService.completeTraining(trainingId);
-      // Оптимистичное обновление UI:
       // Находим тренировку и меняем ее статус на клиенте без повторного запроса
       setTrainings(prev =>
         prev.map(t =>

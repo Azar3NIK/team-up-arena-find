@@ -74,7 +74,7 @@ const CreateTraining = () => {
       // Готовим данные для отправки на API
       const payload: CreateTrainingData = {
         name: data.name,
-        dateTime: dateTime.toISOString(), // Отправляем в формате ISO, который .NET легко поймет
+        dateTime: dateTime.toISOString(), // Отправляем в формате ISO
         durationInMinutes: parseInt(data.duration), // Конвертируем строку в число
         location: data.location,
         description: data.description || undefined,

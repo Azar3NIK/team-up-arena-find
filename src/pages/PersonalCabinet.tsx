@@ -14,8 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
 import { useAuth } from '@/context/AuthContext';
 
-// Определим тип для состояния профиля на фронтенде,
-// который будет более удобен для работы в UI
+
 interface PlayerProfileFrontendState {
   id: string; // ID профиля, обязателен для существующего профиля
   name: string; // fullName на бэкенде
@@ -40,7 +39,6 @@ const PersonalCabinet = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  // !!! ВАЖНО: Этот ID должен быть получен из контекста аутентификации пользователя!
   // Например, если пользователь залогинен, у него есть свой ID профиля.
   const [currentProfileId, setCurrentProfileId] = useState<string | null>(null); 
                                                                                                    
@@ -142,7 +140,7 @@ const PersonalCabinet = () => {
         const mappedProfile: PlayerProfileFrontendState = {
           id: data.id,
           name: data.fullName || "",
-          avatar: data.photoUrl || "/placeholder.svg", // Используйте photoUrl с бэкенда, если есть
+          avatar: data.photoUrl || "/placeholder.svg", 
           location: data.location || "",
           sport: data.game || "",
           experience: mapSkillLevelToExperience(data.skillLevel),
@@ -371,7 +369,7 @@ const PersonalCabinet = () => {
             </CardContent>
           </Card>
 
-             {/* 3. Добавляем новую карточку "Действия" с кнопкой выхода */}
+             {/* карточка "Действия" с кнопкой выхода */}
             <Card>
                  <CardHeader>
                      <CardTitle>Действия</CardTitle>

@@ -1,11 +1,11 @@
-// src/services/playerProfileService.ts
+// playerProfileService.ts
 import axios from 'axios';
 
 // Базовый URL API. 
 const API_BASE_URL = 'https://localhost:7260/playerprofiles'; 
 
 export const axiosInstance = axios.create({
-  // ЭТО ВАЖНО: заставляет axios отправлять куки с кросс-доменными запросами
+  // заставляет axios отправлять куки с кросс-доменными запросами
   withCredentials: true,
 });
 
@@ -97,7 +97,7 @@ export const playerProfileService = {
    */
   updateProfile: async (id: string, data: UpdatePlayerProfileRequestData): Promise<string> => {
     try {
-      // Отправляем ID как часть URL и в теле запроса, как ожидает ваш UpdatePlayerProfile эндпоинт
+      
       const response = await axiosInstance.put<string>(`${API_BASE_URL}/${id}`, data);
       return response.data; // Ожидаем возвращение ID обновленного профиля
     } catch (error) {

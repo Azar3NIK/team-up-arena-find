@@ -139,7 +139,6 @@ const TeamProfile = () => {
             <CardContent><p className="text-gray-700 leading-relaxed">{team.aboutTeam || "Описание команды отсутствует."}</p></CardContent>
           </Card>
           
-          {/* TODO: Добавить карточки с достижениями и требованиями, если такие поля есть в TeamData */}
         </div>
 
         <div className="space-y-6">
@@ -163,7 +162,6 @@ const TeamProfile = () => {
             <CardHeader><CardTitle>Капитан команды</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               <h4 className="font-semibold">{team.ownerUserName || "Имя не указано"}</h4>
-              {/* TODO: Добавить контакты капитана, если они приходят с бэка */}
             </CardContent>
           </Card>
         </div>

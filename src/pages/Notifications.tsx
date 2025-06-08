@@ -1,4 +1,4 @@
-// src/pages/Notifications.tsx
+// Notifications.tsx
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { ArrowLeft, Check, X, Users, UserPlus, Loader2, Inbox } from "lucide-rea
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { invitationService, TeamInvitation } from "@/services/invitationService";
-import { applicationService, TeamApplicationData } from "@/services/applicationService"; // Импорт сервиса заявок
+import { applicationService, TeamApplicationData } from "@/services/applicationService";
 
 // Карточка для Приглашения (от команды игроку)
 const InvitationCard = ({ invitation, onRespond }: { invitation: TeamInvitation, onRespond: (id: string, accept: boolean) => void }) => (

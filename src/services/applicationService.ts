@@ -1,6 +1,6 @@
-// src/services/applicationService.ts
+// applicationService.ts
 
-import { axiosInstance } from './playerProfileService'; // Используем общий настроенный экземпляр axios
+import { axiosInstance } from './playerProfileService'; 
 
 const API_BASE_URL = 'https://localhost:7260/applications';
 

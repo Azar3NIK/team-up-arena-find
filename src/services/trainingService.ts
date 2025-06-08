@@ -1,5 +1,5 @@
-// src/services/trainingService.ts
-import { axiosInstance } from './playerProfileService'; // Используем общий экземпляр axios
+// trainingService.ts
+import { axiosInstance } from './playerProfileService'; 
 
 const API_BASE_URL = 'https://localhost:7260/trainings';
 

@@ -1,15 +1,15 @@
-// --- Файл: MyTeam.tsx ---
+// --- MyTeam.tsx ---
 
-import { useState, useEffect } from "react"; // Добавляем useEffect
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, MapPin, Calendar, Users, Trophy, UserMinus, Settings, Crown, Loader2 } from "lucide-react"; // Добавляем Loader2
+import { ArrowLeft, MapPin, Calendar, Users, Trophy, UserMinus, Settings, Crown, Loader2 } from "lucide-react"; 
 import { useToast } from "@/hooks/use-toast";
-import { teamService, TeamData } from "@/services/teamService"; // Импортируем сервис и тип
+import { teamService, TeamData } from "@/services/teamService"; 
 import { useAuth } from '@/context/AuthContext';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,

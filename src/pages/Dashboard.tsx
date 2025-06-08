@@ -1,12 +1,12 @@
-// --- Файл: Dashboard.tsx ---
+// Dashboard.tsx ---
 
-import { useState } from "react"; // Добавляем импорт
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Bell, Calendar, User, Search, UserPlus, Info, Loader2 } from "lucide-react"; // Добавляем Loader2
-import { Link, useNavigate } from "react-router-dom"; // Добавляем useNavigate
-import { useToast } from "@/hooks/use-toast"; // Добавляем useToast
-import { teamService } from "@/services/teamService"; // Импортируем наш новый сервис
+import { Users, Bell, Calendar, User, Search, UserPlus, Info, Loader2 } from "lucide-react"; 
+import { Link, useNavigate } from "react-router-dom"; 
+import { useToast } from "@/hooks/use-toast"; 
+import { teamService } from "@/services/teamService"; 
 
 const Dashboard = () => {
   const navigate = useNavigate();

@@ -44,7 +44,7 @@ const CTASection = () => {
         </div>
       </div>
 
-      {/* Decorative Elements */}
+      
       <div className="absolute top-10 left-10 w-20 h-20 bg-white/5 rounded-full animate-pulse"></div>
       <div className="absolute bottom-10 right-10 w-16 h-16 bg-sport-orange/20 rounded-full animate-pulse" style={{
       animationDelay: '1s'
