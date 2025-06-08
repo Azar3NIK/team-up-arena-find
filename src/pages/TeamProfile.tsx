@@ -8,7 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Calendar, Users, Trophy, Mail, Phone, Loader2, ServerCrash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { teamService, TeamData } from "@/services/teamService"; // Импортируем наш сервис
+import { teamService, TeamData } from "@/services/teamService"; 
+import { applicationService } from "@/services/applicationService";
 
 // Вспомогательная функция для маппинга уровня
 const mapNumberToLevel = (level: number | null): string => {
@@ -61,16 +62,27 @@ const TeamProfile = () => {
   }, [id, toast]);
   
   const handleApplyToTeam = async () => {
+    if (!team) return;
+
     setIsApplying(true);
-    // TODO: Реализовать логику подачи заявки на вступление
-    // Например, `applicationService.sendApplication(team.id)`
-    setTimeout(() => {
+    try {
+      const response = await applicationService.sendApplication(team.id);
       toast({
         title: "Заявка отправлена!",
-        description: "Ваша заявка на вступление в команду отправлена капитану.",
+        description: `Ваша заявка на вступление в команду "${team.name}" успешно отправлена.`,
       });
+      console.log("Заявка создана, ID:", response.applicationId);
+    } catch (error: any) {
+      // Улучшенная обработка ошибок от сервера
+      const errorMessage = error.response?.data || "Не удалось отправить заявку. Попробуйте снова.";
+      toast({
+        title: "Ошибка",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
       setIsApplying(false);
-    }, 1000);
+    }
   };
 
   // Состояние загрузки
@@ -135,7 +147,15 @@ const TeamProfile = () => {
             <CardHeader><CardTitle>Присоединиться к команде</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-gray-600">Команда открыта для новых игроков. Подайте заявку, чтобы присоединиться.</p>
-              <Button onClick={handleApplyToTeam} disabled={isApplying} className="w-full">{isApplying ? "Отправляется..." : "Подать заявку"}</Button>
+              <Button onClick={handleApplyToTeam} disabled={isApplying} className="w-full">
+                 {isApplying ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Отправка...
+                  </>
+                ) : (
+                  "Подать заявку"
+                )}</Button>
             </CardContent>
           </Card>
 

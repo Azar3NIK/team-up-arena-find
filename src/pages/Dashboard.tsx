@@ -117,7 +117,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Новые приглашения и сообщения
+                  Новые приглашения и заявки
                 </CardDescription>
               </CardContent>
             </Link>
@@ -133,7 +133,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Расписание и участие в тренировках
+                  Тренировки вашей команды
                 </CardDescription>
               </CardContent>
             </Link>

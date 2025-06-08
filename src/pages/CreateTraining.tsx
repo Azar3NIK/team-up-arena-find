@@ -33,16 +33,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { trainingService, CreateTrainingData } from "@/services/trainingService";
 
 const trainingSchema = z.object({
   name: z.string().min(3, "Название должно содержать минимум 3 символа"),
-  date: z.date({
-    required_error: "Выберите дату тренировки",
-  }),
-  time: z.string().min(1, "Выберите время начала"),
-  duration: z.string().min(1, "Выберите продолжительность"),
+  date: z.date({ required_error: "Выберите дату тренировки" }),
+  time: z.string().nonempty("Выберите время начала"),
+  duration: z.string().nonempty("Выберите продолжительность"),
   location: z.string().min(3, "Укажите место проведения"),
-  description: z.string().optional(),
+  description: z.string().max(500, "Описание не должно превышать 500 символов").optional(),
 });
 
 type TrainingFormData = z.infer<typeof trainingSchema>;
@@ -65,17 +64,35 @@ const CreateTraining = () => {
 
   const onSubmit = async (data: TrainingFormData) => {
     setIsSubmitting(true);
-    
-    // Имитация создания тренировки
-    setTimeout(() => {
-      console.log("Создание тренировки:", data);
+    try {
+      // Собираем дату и время в один объект Date
+      const [hours, minutes] = data.time.split(':');
+      const dateTime = new Date(data.date);
+      dateTime.setHours(parseInt(hours), parseInt(minutes));
+      dateTime.setMinutes(parseInt(minutes));
+
+      // Готовим данные для отправки на API
+      const payload: CreateTrainingData = {
+        name: data.name,
+        dateTime: dateTime.toISOString(), // Отправляем в формате ISO, который .NET легко поймет
+        durationInMinutes: parseInt(data.duration), // Конвертируем строку в число
+        location: data.location,
+        description: data.description || undefined,
+      };
+
+      await trainingService.createTraining(payload);
+      
+      toast({ title: "Тренировка создана!", description: "Новая тренировка успешно добавлена в расписание." });
+      navigate("/trainings"); // Перенаправляем на страницу со списком тренировок
+    } catch (error: any) {
       toast({
-        title: "Тренировка создана!",
-        description: "Тренировка успешно создана и участники будут уведомлены.",
+        title: "Ошибка",
+        description: error.response?.data || "Не удалось создать тренировку.",
+        variant: "destructive",
       });
+    } finally {
       setIsSubmitting(false);
-      navigate("/dashboard");
-    }, 1000);
+    }
   };
 
   // Генерация времени с интервалом 30 минут

@@ -1,9 +1,10 @@
+// src/pages/Trainings.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { Calendar, Clock, MapPin, Plus, CheckCircle, AlertCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, Plus, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,184 +21,151 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-
-// Типы данных
-interface Training {
-  id: string;
-  name: string;
-  date: string;
-  time: string;
-  duration: string;
-  location: string;
-  description?: string;
-  status: 'active' | 'completed';
-  participants: number;
-}
+import { trainingService, TrainingData } from "@/services/trainingService";
 
 const Trainings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [trainings, setTrainings] = useState<TrainingData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Моковые данные тренировок
-  const [trainings, setTrainings] = useState<Training[]>([
-    {
-      id: "1",
-      name: "Вечерняя тренировка по футболу",
-      date: "2024-06-05",
-      time: "19:00",
-      duration: "120",
-      location: "Стадион Лужники, поле №3",
-      description: "Работа над техникой и тактикой",
-      status: 'active',
-      participants: 15
-    },
-    {
-      id: "2",
-      name: "Утренняя пробежка",
-      date: "2024-06-07",
-      time: "08:00",
-      duration: "60",
-      location: "Парк Сокольники",
-      status: 'active',
-      participants: 8
-    },
-    {
-      id: "3",
-      name: "Тренировка по баскетболу",
-      date: "2024-05-30",
-      time: "18:00",
-      duration: "90",
-      location: "Спортзал школы №15",
-      description: "Отработка бросков",
-      status: 'completed',
-      participants: 12
-    },
-    {
-      id: "4",
-      name: "Силовая подготовка",
-      date: "2024-05-28",
-      time: "17:00",
-      duration: "90",
-      location: "Фитнес-центр 'Атлант'",
-      status: 'completed',
-      participants: 10
-    }
-  ]);
-
-  const activeTrainings = trainings.filter(training => training.status === 'active');
-  const completedTrainings = trainings.filter(training => training.status === 'completed');
-
-  const handleCompleteTraining = (trainingId: string) => {
-    setTrainings(prev => 
-      prev.map(training => 
-        training.id === trainingId 
-          ? { ...training, status: 'completed' as const }
-          : training
-      )
-    );
-    
-    toast({
-      title: "Тренировка завершена",
-      description: "Тренировка была успешно завершена",
-    });
-  };
-
-  const getDurationText = (minutes: string) => {
-    const mins = parseInt(minutes);
-    if (mins < 60) {
-      return `${mins} мин`;
-    } else if (mins === 60) {
-      return "1 час";
-    } else {
-      const hours = Math.floor(mins / 60);
-      const remainingMins = mins % 60;
-      if (remainingMins === 0) {
-        return `${hours} час${hours > 1 ? 'а' : ''}`;
-      } else {
-        return `${hours} ч ${remainingMins} мин`;
+  useEffect(() => {
+    const fetchTrainings = async () => {
+      setIsLoading(true);
+      try {
+        const data = await trainingService.getMyTeamTrainings();
+        setTrainings(data);
+      } catch (error) {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить расписание тренировок.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
+    };
+    fetchTrainings();
+  }, [toast]);
+
+  const handleCompleteTraining = async (trainingId: string) => {
+    try {
+      await trainingService.completeTraining(trainingId);
+      // Оптимистичное обновление UI:
+      // Находим тренировку и меняем ее статус на клиенте без повторного запроса
+      setTrainings(prev =>
+        prev.map(t =>
+          t.id === trainingId ? { ...t, isCompleted: true } : t
+        )
+      );
+      toast({
+        title: "Успех",
+        description: "Тренировка была отмечена как завершенная.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Ошибка",
+        description: error.response?.data || "Не удалось завершить тренировку.",
+        variant: "destructive",
+      });
     }
   };
 
+  // Фильтруем тренировки на активные и завершенные
+  const activeTrainings = trainings.filter(t => !t.isCompleted);
+  const completedTrainings = trainings.filter(t => t.isCompleted);
+
+  // Вспомогательная функция для форматирования продолжительности
+  const getDurationText = (minutes: number) => {
+    if (minutes < 60) return `${minutes} мин`;
+    if (minutes % 60 === 0) {
+      const hours = minutes / 60;
+      return `${hours} час${hours > 1 ? (hours > 4 ? 'ов' : 'а') : ''}`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMins = minutes % 60;
+    return `${hours} ч ${remainingMins} мин`;
+  };
+
+  // Вспомогательная функция для форматирования даты и времени
   const formatTrainingDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return format(date, "d MMMM yyyy", { locale: ru });
+    return format(date, "d MMMM yyyy, HH:mm", { locale: ru });
   };
 
-  const TrainingCard = ({ training }: { training: Training }) => (
-    <Card className="hover:shadow-md transition-shadow">
+  // Переиспользуемый компонент для карточки тренировки
+  const TrainingCard = ({ training }: { training: TrainingData }) => (
+    <Card className="hover:shadow-md transition-shadow flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
+          <div className="flex-1 pr-2">
             <CardTitle className="text-lg mb-2">{training.name}</CardTitle>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                <span>{formatTrainingDate(training.date)}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                <span>{training.time}</span>
-              </div>
+            <div className="flex items-center gap-1 text-sm text-gray-600">
+              <Calendar className="h-4 w-4" />
+              <span>{formatTrainingDate(training.dateTime)}</span>
             </div>
           </div>
-          <Badge variant={training.status === 'active' ? 'default' : 'secondary'}>
-            {training.status === 'active' ? 'Активная' : 'Завершена'}
+          <Badge variant={!training.isCompleted ? 'default' : 'secondary'} className="flex-shrink-0">
+            {!training.isCompleted ? 'Активная' : 'Завершена'}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="flex-grow flex flex-col justify-between">
+        <div className="space-y-3 mb-4">
           <div className="flex items-center gap-2 text-sm">
             <MapPin className="h-4 w-4 text-gray-500" />
             <span>{training.location}</span>
           </div>
-          
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              Продолжительность: {getDurationText(training.duration)}
-            </span>
-            <span className="text-gray-600">
-              Участников: {training.participants}
+            <span className="text-gray-600 flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                {getDurationText(training.durationInMinutes)}
             </span>
           </div>
-
           {training.description && (
-            <p className="text-sm text-gray-600 mt-2">{training.description}</p>
-          )}
-
-          {training.status === 'active' && (
-            <div className="pt-3 border-t">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full">
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Завершить тренировку
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Завершить тренировку?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Вы уверены, что хотите завершить тренировку "{training.name}"? 
-                      Это действие нельзя будет отменить.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Отмена</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleCompleteTraining(training.id)}>
-                      Завершить
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+            <p className="text-sm text-gray-600 pt-2 border-t">{training.description}</p>
           )}
         </div>
+        {!training.isCompleted && (
+          <div className="pt-3 border-t">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Завершить тренировку
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Завершить тренировку?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Вы уверены, что хотите отметить тренировку "{training.name}" как завершенную?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Отмена</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleCompleteTraining(training.id)}>
+                    Завершить
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 
+  // Рендер состояния загрузки
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex justify-center items-center h-[calc(100vh-200px)]">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Основной рендер компонента
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -240,7 +208,7 @@ const Trainings = () => {
                   Нет активных тренировок
                 </h3>
                 <p className="text-gray-600 text-center mb-4">
-                  Создайте первую тренировку для вашей команды
+                  Создайте первую тренировку для вашей команды.
                 </p>
                 <Button onClick={() => navigate('/create-training')}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -266,7 +234,7 @@ const Trainings = () => {
                   Нет завершенных тренировок
                 </h3>
                 <p className="text-gray-600 text-center">
-                  Завершенные тренировки будут отображаться здесь
+                  История завершенных тренировок будет отображаться здесь.
                 </p>
               </CardContent>
             </Card>
