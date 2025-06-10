@@ -262,10 +262,10 @@ const PlayerProfile = () => {
                 )}
               </Button>
               )}
-              <Button variant="outline" className="w-full">
+              {/* <Button variant="outline" className="w-full">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Написать сообщение
-              </Button>
+              </Button> */}
             </CardContent>
           </Card>
           

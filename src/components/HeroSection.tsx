@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Search, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 const HeroSection = () => {
   return <section className="relative overflow-hidden">
       
@@ -18,14 +19,18 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-slide-up">
+            <Link to="/register">
             <Button size="lg" className="bg-sport-orange hover:bg-sport-orange/90 text-white px-8 py-3 text-lg">
               <Users className="mr-2 h-5 w-5" />
               Найти команду
             </Button>
+            </Link>
+            <Link to="/register">
             <Button size="lg" variant="outline" className="border-white hover:bg-white px-8 py-3 text-lg text-gray-800">
               <Search className="mr-2 h-5 w-5" />
               Найти игроков
             </Button>
+            </Link>
           </div>
         </div>
       </div>

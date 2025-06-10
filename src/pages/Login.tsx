@@ -130,11 +130,11 @@ const Login = () => {
               </div>
             </div>
             
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <Link to="/forgot-password" className="text-sm text-sport-orange hover:underline">
                 Забыли пароль?
               </Link>
-            </div>
+            </div> */}
             
             <Button 
               type="submit" 
