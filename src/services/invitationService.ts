@@ -1,7 +1,7 @@
 // invitationService.ts
-import { axiosInstance } from './playerProfileService'; 
+import { axiosInstance } from "./playerProfileService";
 
-const API_BASE_URL = 'https://localhost:7260/invitations'; 
+const API_BASE_URL = "https://localhost:7260/invitations";
 
 // Интерфейс для данных, которые приходят с бэкенда
 // Соответствует вашему TeamInvitationResponse.cs
@@ -12,7 +12,8 @@ export interface TeamInvitation {
   invitedUserId: string;
   invitedUserName: string;
   senderUserId: string;
-  senderUserName:string;
+  senderUserName: string;
+  senderPlayerProfileId: string | null;
   invitationDate: string; // Дата приходит как строка
   status: number; // 0: Pending, 1: Accepted, 2: Declined
 }
@@ -36,7 +37,9 @@ export const invitationService = {
    */
   getPendingInvitations: async (): Promise<TeamInvitation[]> => {
     try {
-      const response = await axiosInstance.get<TeamInvitation[]>(`${API_BASE_URL}/pending`);
+      const response = await axiosInstance.get<TeamInvitation[]>(
+        `${API_BASE_URL}/pending`
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при получении ожидающих приглашений:", error);
@@ -48,9 +51,14 @@ export const invitationService = {
    * Отправляет приглашение игроку в команду.
    * @param data Данные для отправки приглашения.
    */
-  sendInvitation: async (data: SendInvitationData): Promise<{ invitationId: string }> => {
+  sendInvitation: async (
+    data: SendInvitationData
+  ): Promise<{ invitationId: string }> => {
     try {
-      const response = await axiosInstance.post<{ invitationId: string }>(`${API_BASE_URL}/send`, data);
+      const response = await axiosInstance.post<{ invitationId: string }>(
+        `${API_BASE_URL}/send`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при отправке приглашения:", error);
@@ -63,9 +71,15 @@ export const invitationService = {
    * @param invitationId ID приглашения.
    * @param data Данные ответа.
    */
-  respondToInvitation: async (invitationId: string, data: RespondToInvitationData): Promise<string> => {
+  respondToInvitation: async (
+    invitationId: string,
+    data: RespondToInvitationData
+  ): Promise<string> => {
     try {
-      const response = await axiosInstance.post<string>(`${API_BASE_URL}/${invitationId}/respond`, data);
+      const response = await axiosInstance.post<string>(
+        `${API_BASE_URL}/${invitationId}/respond`,
+        data
+      );
       return response.data; // Ожидаем сообщение об успехе
     } catch (error) {
       console.error("Ошибка при ответе на приглашение:", error);

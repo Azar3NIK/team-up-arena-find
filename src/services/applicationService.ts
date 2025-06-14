@@ -1,8 +1,8 @@
 // applicationService.ts
 
-import { axiosInstance } from './playerProfileService'; 
+import { axiosInstance } from "./playerProfileService";
 
-const API_BASE_URL = 'https://localhost:7260/applications';
+const API_BASE_URL = "https://localhost:7260/applications";
 
 // Интерфейс для заявки, которая приходит капитану в уведомления
 // Соответствует TeamApplicationResponse.cs
@@ -13,6 +13,7 @@ export interface TeamApplicationData {
   applicantUserName: string;
   applicationDate: string; // Дата приходит как строка
   status: number; // 0: Pending, 1: Accepted, 2: Declined
+  playerProfileId: string | null;
 }
 
 export const applicationService = {
@@ -20,10 +21,15 @@ export const applicationService = {
    * Отправляет заявку от текущего игрока в команду.
    * @param teamId ID команды, в которую подается заявка.
    */
-  sendApplication: async (teamId: string): Promise<{ applicationId: string }> => {
+  sendApplication: async (
+    teamId: string
+  ): Promise<{ applicationId: string }> => {
     try {
       // Эндпоинт ожидает { "teamId": "..." } в теле запроса
-      const response = await axiosInstance.post<{ applicationId: string }>(`${API_BASE_URL}/send`, { teamId });
+      const response = await axiosInstance.post<{ applicationId: string }>(
+        `${API_BASE_URL}/send`,
+        { teamId }
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при отправке заявки:", error);
@@ -36,7 +42,9 @@ export const applicationService = {
    */
   getPendingForMyTeam: async (): Promise<TeamApplicationData[]> => {
     try {
-      const response = await axiosInstance.get<TeamApplicationData[]>(`${API_BASE_URL}/pending-for-my-team`);
+      const response = await axiosInstance.get<TeamApplicationData[]>(
+        `${API_BASE_URL}/pending-for-my-team`
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при получении заявок:", error);
@@ -49,10 +57,16 @@ export const applicationService = {
    * @param applicationId ID заявки.
    * @param accept true для принятия, false для отклонения.
    */
-  respondToApplication: async (applicationId: string, accept: boolean): Promise<string> => {
+  respondToApplication: async (
+    applicationId: string,
+    accept: boolean
+  ): Promise<string> => {
     try {
       // Эндпоинт ожидает { "accept": true/false } в теле запроса
-      const response = await axiosInstance.post<string>(`${API_BASE_URL}/${applicationId}/respond`, { accept });
+      const response = await axiosInstance.post<string>(
+        `${API_BASE_URL}/${applicationId}/respond`,
+        { accept }
+      );
       return response.data; // Ожидаем сообщение об успехе от сервера
     } catch (error) {
       console.error("Ошибка при ответе на заявку:", error);

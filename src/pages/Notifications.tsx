@@ -55,15 +55,39 @@ const InvitationCard = ({
     </CardHeader>
     <CardContent>
       <div className="flex items-start space-x-4">
-        <Avatar className="h-12 w-12">
-          <AvatarFallback>
-            {invitation.teamName.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        {/* Аватар команды можно сделать ссылкой на профиль команды */}
+        <Link to={`/team/${invitation.teamId}`}>
+          <Avatar className="h-12 w-12">
+            <AvatarFallback>
+              {invitation.teamName.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
         <div className="flex-1">
           <p className="text-gray-700 mb-4">
-            Капитан <strong>{invitation.senderUserName}</strong> приглашает вас
-            присоединиться к команде <strong>"{invitation.teamName}"</strong>.
+            Капитан{" "}
+            {/* Имя капитана делаем ссылкой на его профиль, если ID профиля есть */}
+            {invitation.senderPlayerProfileId ? (
+              <Link
+                to={`/player/${invitation.senderPlayerProfileId}`}
+                className="font-semibold text-blue-600 hover:underline"
+              >
+                {invitation.senderUserName}
+              </Link>
+            ) : (
+              <strong className="font-semibold">
+                {invitation.senderUserName}
+              </strong>
+            )}{" "}
+            приглашает вас присоединиться к команде{" "}
+            {/* Название команды тоже делаем ссылкой */}
+            <Link
+              to={`/team/${invitation.teamId}`}
+              className="font-semibold text-blue-600 hover:underline"
+            >
+              "{invitation.teamName}"
+            </Link>
+            .
           </p>
           <div className="flex space-x-2">
             <Button
@@ -113,8 +137,20 @@ const ApplicationCard = ({
         </Avatar>
         <div className="flex-1">
           <p className="text-gray-700 mb-4">
-            Игрок <strong>{application.applicantUserName}</strong> хочет
-            присоединиться к вашей команде.
+            Игрок{" "}
+            {application.playerProfileId ? (
+              <Link
+                to={`/player/${application.playerProfileId}`}
+                className="font-semibold text-blue-600 hover:underline"
+              >
+                {application.applicantUserName}
+              </Link>
+            ) : (
+              <strong className="font-semibold">
+                {application.applicantUserName}
+              </strong>
+            )}{" "}
+            хочет присоединиться к вашей команде.
           </p>
           <div className="flex space-x-2">
             <Button
