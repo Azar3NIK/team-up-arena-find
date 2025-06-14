@@ -1,14 +1,15 @@
-// Notifications.tsx
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft, Check, X, Users, UserPlus, Loader2, Inbox } from "lucide-react";
+import { ArrowLeft, Check, X, Users, UserPlus, Loader2, Inbox, Calendar, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { invitationService, TeamInvitation } from "@/services/invitationService";
 import { applicationService, TeamApplicationData } from "@/services/applicationService";
+import { notificationService, GenericNotificationData } from "@/services/notificationService";
+import { ru } from 'date-fns/locale';
+import { formatInTimeZone } from 'date-fns-tz';
 
 // Карточка для Приглашения (от команды игроку)
 const InvitationCard = ({ invitation, onRespond }: { invitation: TeamInvitation, onRespond: (id: string, accept: boolean) => void }) => (
@@ -54,22 +55,74 @@ const ApplicationCard = ({ application, onRespond }: { application: TeamApplicat
   </Card>
 );
 
+
+const TrainingNotificationCard = ({ notification, onMarkAsRead }: { notification: GenericNotificationData, onMarkAsRead: (id: string) => void }) => {
+    console.log(`Рендеринг карточки TrainingNotificationCard с ID: ${notification.id}`);
+    let displayMessage = notification.message;
+    let formattedTrainingDate: string | null = null;
+    
+    const isoDateRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?/;
+    const match = notification.message.match(isoDateRegex);
+
+    if (match && match[0]) {
+        try {
+            const extractedDateString = match[0];
+            formattedTrainingDate = formatInTimeZone(extractedDateString, 'UTC', 'd MMMM yyyy, HH:mm', { locale: ru });
+            displayMessage = notification.message.replace(extractedDateString, formattedTrainingDate);
+        } catch (e) { console.error(e); }
+    }
+
+      return (
+        <Card className="bg-blue-50 border-blue-200 flex flex-col">
+            <CardHeader className="pb-4"> {/* Уменьшаем нижний отступ */}
+                <CardTitle className="text-base flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" /> Уведомление о тренировке
+                </CardTitle>
+                <CardDescription>
+                    Получено: {new Date(notification.createdAt).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow">
+                <p className="text-gray-800">{displayMessage}</p>
+            </CardContent>
+            {/* НОВЫЙ БЛОК ДЛЯ КНОПКИ */}
+            <div className="p-4 pt-0 border-t-0 flex justify-end">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-600 hover:text-gray-900"
+                  onClick={() => onMarkAsRead(notification.id)}
+                >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Просмотрено
+                </Button>
+            </div>
+        </Card>
+    );
+};
+
 const Notifications = () => {
   const { toast } = useToast();
   const [invitations, setInvitations] = useState<TeamInvitation[]>([]);
   const [applications, setApplications] = useState<TeamApplicationData[]>([]);
+  const [genericNotifications, setGenericNotifications] = useState<GenericNotificationData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        const [invitationsData, applicationsData] = await Promise.all([
+        const [invitationsData, applicationsData, genericData] = await Promise.all([
           invitationService.getPendingInvitations(),
           applicationService.getPendingForMyTeam(),
+           notificationService.getMyGenericNotifications(),
         ]);
+
+        console.log("ДАННЫЕ ИЗ API:", { invitationsData, applicationsData, genericData });
+
         setInvitations(invitationsData);
         setApplications(applicationsData);
+        setGenericNotifications(genericData);
       } catch (error) {
         toast({ title: "Ошибка", description: "Не удалось загрузить уведомления.", variant: "destructive" });
       } finally {
@@ -99,6 +152,35 @@ const Notifications = () => {
     }
   };
 
+  const handleDismissNotification = async (notificationId: string) => {
+    try {
+        // Вызываем новый метод сервиса
+        console.log(`КЛИК! Вызван onMarkAsRead с ID: ${notificationId}`);
+        await notificationService.dismissNotification(notificationId);
+        
+        // Оптимистичное обновление остается таким же
+        setGenericNotifications(prev => prev.filter(n => n.id !== notificationId));
+
+    } catch (error) {
+        toast({
+            title: "Ошибка",
+            description: "Не удалось удалить уведомление.",
+            variant: "destructive",
+        });
+    }
+  };
+
+  const renderGenericNotification = (notification: GenericNotificationData) => {
+    console.log("Рендеринг уведомления с типом:", notification.type); // <-- ЛОГ
+    switch (notification.type) {
+        case 2: // Число соответствует enum NotificationType.NewTraining
+            return <TrainingNotificationCard key={notification.id} notification={notification} onMarkAsRead={handleDismissNotification} />;
+        default:
+            console.log("Неизвестный тип уведомления, не рендерится."); // <-- ЛОГ
+            return null; 
+    }
+}
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm border-b border-gray-200">
@@ -107,7 +189,7 @@ const Notifications = () => {
       <div className="container mx-auto px-4 py-8">
         {isLoading ? (
           <div className="flex justify-center items-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-        ) : (invitations.length === 0 && applications.length === 0) ? (
+        ) : (invitations.length === 0 && applications.length === 0 && genericNotifications.length === 0) ? (
           <Card><CardContent className="p-10 text-center"><Inbox className="mx-auto h-12 w-12 text-gray-400" /><h3 className="mt-2 text-lg font-medium">Нет новых уведомлений</h3><p className="mt-1 text-sm text-gray-500">Приглашения и заявки будут отображаться здесь.</p></CardContent></Card>
         ) : (
           <div className="space-y-8">
@@ -124,6 +206,15 @@ const Notifications = () => {
                 <h2 className="text-xl font-bold mb-4">Приглашения для вас ({invitations.length})</h2>
                 <div className="space-y-4">
                   {invitations.map(inv => <InvitationCard key={inv.id} invitation={inv} onRespond={handleInvitationResponse} />)}
+                </div>
+              </div>
+            )}
+            {/* БЛОК для информационных уведомлений */}
+            {genericNotifications.length > 0 && (
+              <div>
+                <h2 className="text-xl font-bold mb-4">События и новости</h2>
+                <div className="space-y-4">
+                    {genericNotifications.map(renderGenericNotification)}
                 </div>
               </div>
             )}

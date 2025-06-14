@@ -63,33 +63,36 @@ const CreateTraining = () => {
   });
 
   const onSubmit = async (data: TrainingFormData) => {
-    setIsSubmitting(true);
+     setIsSubmitting(true);
     try {
-      // Собираем дату и время в один объект Date
-      const [hours, minutes] = data.time.split(':');
-      const dateTime = new Date(data.date);
-      dateTime.setHours(parseInt(hours), parseInt(minutes));
-      dateTime.setMinutes(parseInt(minutes));
+      // --- ИЗМЕНЕНИЯ ЗДЕСЬ ---
 
-      // Готовим данные для отправки на API
+      // 1. Получаем компоненты даты из календаря
+      const year = data.date.getFullYear();
+      const month = data.date.getMonth(); // 0-11
+      const day = data.date.getDate();
+
+      // 2. Получаем компоненты времени из селектора
+      const [hours, minutes] = data.time.split(':').map(Number);
+
+      // 3. Создаем объект Date, указывая ему компоненты времени СРАЗУ В UTC
+      const utcDateTime = new Date(Date.UTC(year, month, day, hours, minutes));
+
+      // 4. Готовим данные для отправки
       const payload: CreateTrainingData = {
         name: data.name,
-        dateTime: dateTime.toISOString(), // Отправляем в формате ISO
-        durationInMinutes: parseInt(data.duration), // Конвертируем строку в число
+        // .toISOString() теперь просто отформатирует нашу UTC-дату в строку без конвертации
+        dateTime: utcDateTime.toISOString(), 
+        durationInMinutes: parseInt(data.duration),
         location: data.location,
-        description: data.description || undefined,
+        description: data.description,
       };
 
       await trainingService.createTraining(payload);
-      
-      toast({ title: "Тренировка создана!", description: "Новая тренировка успешно добавлена в расписание." });
-      navigate("/trainings"); // Перенаправляем на страницу со списком тренировок
+      toast({ title: "Тренировка создана!" });
+      navigate("/trainings"); 
     } catch (error: any) {
-      toast({
-        title: "Ошибка",
-        description: error.response?.data || "Не удалось создать тренировку.",
-        variant: "destructive",
-      });
+      toast({ title: "Ошибка", description: error.response?.data || "Не удалось создать тренировку", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }

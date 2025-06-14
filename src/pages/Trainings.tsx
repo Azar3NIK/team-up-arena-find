@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatInTimeZone } from 'date-fns-tz';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,8 +89,16 @@ const Trainings = () => {
 
   // Вспомогательная функция для форматирования даты и времени
   const formatTrainingDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return format(date, "d MMMM yyyy, HH:mm", { locale: ru });
+    try {
+      // Используем тот же подход, что и в уведомлениях:
+      // форматируем UTC-дату, но выводим ее как будто она в часовом поясе UTC,
+      // чтобы избежать конвертации в локальное время.
+      return formatInTimeZone(dateStr, 'UTC', 'd MMMM yyyy, HH:mm', { locale: ru });
+    } catch (e) {
+      console.error("Ошибка форматирования даты тренировки:", e);
+      // Возвращаем что-то осмысленное в случае ошибки
+      return "Неверный формат даты";
+    }
   };
 
   // Переиспользуемый компонент для карточки тренировки
