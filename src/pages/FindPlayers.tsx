@@ -1,13 +1,32 @@
 import { useState, useEffect } from "react";
 import { PlayerCard } from "@/components/PlayerCard";
 import { PlayerFilters } from "@/components/PlayerFilters";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Filter, ArrowLeft } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
-import { playerProfileService, PlayerProfileBackendData, PlayerProfileFilterRequest } from "@/services/playerProfileService";
+import {
+  playerProfileService,
+  PlayerProfileBackendData,
+  PlayerProfileFilterRequest,
+} from "@/services/playerProfileService";
 import { useNavigate } from "react-router-dom";
+import {
+  CustomPaginationPrevious,
+  CustomPaginationNext,
+} from "@/components/ui/custom-pagination";
 
 // Frontend interface для PlayerCard, чтобы отображать данные
 interface PlayerCardProps {
@@ -40,13 +59,13 @@ const FindPlayers = () => {
   const navigate = useNavigate();
 
   const [filters, setFilters] = useState<FrontendFiltersState>({
-    search: '',
-    sport: '',
-    location: '',
-    experience: 'all', // Изначально выбрано "все"
+    search: "",
+    sport: "",
+    location: "",
+    experience: "all", // Изначально выбрано "все"
     teamStatus: [],
-    age: '',
-    gender: 'all', // Изначально выбрано "все"
+    age: "",
+    gender: "all", // Изначально выбрано "все"
   });
 
   const [players, setPlayers] = useState<PlayerCardProps[]>([]);
@@ -60,50 +79,73 @@ const FindPlayers = () => {
   // --- Вспомогательные функции для маппинга данных между фронтендом и бэкендом ---
   const mapSkillLevelToExperience = (skillLevel?: number): string => {
     switch (skillLevel) {
-      case 0: return "Новичок";
-      case 1: return "Любитель";
-      case 2: return "Полупрофессионал";
-      case 3: return "Профессионал";
-      default: return "Любитель"; // Значение по умолчанию или "Не указано"
+      case 0:
+        return "Новичок";
+      case 1:
+        return "Любитель";
+      case 2:
+        return "Полупрофессионал";
+      case 3:
+        return "Профессионал";
+      default:
+        return "Любитель"; // Значение по умолчанию или "Не указано"
     }
   };
 
-  const mapExperienceToSkillLevel = (experience: string): number | undefined => {
+  const mapExperienceToSkillLevel = (
+    experience: string
+  ): number | undefined => {
     switch (experience) {
-      case "Новичок": return 0;
-      case "Любитель": return 1;
-      case "Полупрофессионал": return 2;
-      case "Профессионал": return 3;
-      case "all": return undefined; // "all" означает, что фильтр не применен для этого поля
-      default: return undefined;
-    }
-  };
-
-  const mapTeamFindingStatusToFrontend = (status?: number): "looking" | "has-team" | "not-looking" => {
-    switch (status) {
-      case 0: return "looking";
-      case 1: return "has-team";
-      case 2: return "not-looking";
-      default: return "not-looking"; // Значение по умолчанию
-    }
-  };
-
-  const mapTeamStatusToBackend = (statusArray: string[]): number | undefined => {
- 
-    if (statusArray.length === 0) {
+      case "Новичок":
+        return 0;
+      case "Любитель":
+        return 1;
+      case "Полупрофессионал":
+        return 2;
+      case "Профессионал":
+        return 3;
+      case "all":
+        return undefined; // "all" означает, что фильтр не применен для этого поля
+      default:
         return undefined;
+    }
+  };
+
+  const mapTeamFindingStatusToFrontend = (
+    status?: number
+  ): "looking" | "has-team" | "not-looking" => {
+    switch (status) {
+      case 0:
+        return "looking";
+      case 1:
+        return "has-team";
+      case 2:
+        return "not-looking";
+      default:
+        return "not-looking"; // Значение по умолчанию
+    }
+  };
+
+  const mapTeamStatusToBackend = (
+    statusArray: string[]
+  ): number | undefined => {
+    if (statusArray.length === 0) {
+      return undefined;
     }
     const status = statusArray[0]; // Берем первый выбранный статус
 
     switch (status) {
-      case "looking": return 0;
-      case "has-team": return 1;
-      case "not-looking": return 2;
-      default: return undefined;
+      case "looking":
+        return 0;
+      case "has-team":
+        return 1;
+      case "not-looking":
+        return 2;
+      default:
+        return undefined;
     }
   };
   // --- Конец вспомогательных функций ---
-
 
   // Загрузка игроков на основе фильтров
   useEffect(() => {
@@ -113,23 +155,31 @@ const FindPlayers = () => {
       try {
         // Сопоставляем значения фильтров фронтенда с форматом запроса бэкенда
         const backendFilters: PlayerProfileFilterRequest = {
-          fullName: filters.search.trim() !== '' ? filters.search.trim() : undefined, // Если search пустой, отправляем undefined
-          game: filters.sport.trim() !== '' ? filters.sport.trim() : undefined, // Если sport пустой, отправляем undefined
-          location: filters.location.trim() !== '' ? filters.location.trim() : undefined,
+          fullName:
+            filters.search.trim() !== "" ? filters.search.trim() : undefined, // Если search пустой, отправляем undefined
+          game: filters.sport.trim() !== "" ? filters.sport.trim() : undefined, // Если sport пустой, отправляем undefined
+          location:
+            filters.location.trim() !== ""
+              ? filters.location.trim()
+              : undefined,
           skillLevel: mapExperienceToSkillLevel(filters.experience),
           teamFindingStatus: mapTeamStatusToBackend(filters.teamStatus),
           // Исправление для возраста: парсим в число, если не пустая строка
-          age: filters.age.trim() !== '' ? parseInt(filters.age) : undefined,
+          age: filters.age.trim() !== "" ? parseInt(filters.age) : undefined,
           // Исправление для пола: если "all" или пустая строка, отправляем undefined
-          gender: filters.gender === "all" || filters.gender.trim() === '' ? undefined : filters.gender,
+          gender:
+            filters.gender === "all" || filters.gender.trim() === ""
+              ? undefined
+              : filters.gender,
         };
-        
+
         console.log("Фильтры бэкенда отправлены:", backendFilters); // Отладочная строка
 
-        const data: PlayerProfileBackendData[] = await playerProfileService.searchProfiles(backendFilters);
-        
+        const data: PlayerProfileBackendData[] =
+          await playerProfileService.searchProfiles(backendFilters);
+
         // Сопоставляем данные бэкенда с форматом PlayerCardProps для фронтенда
-        const mappedPlayers: PlayerCardProps[] = data.map(p => ({
+        const mappedPlayers: PlayerCardProps[] = data.map((p) => ({
           id: p.id,
           name: p.fullName || "Имя не указано",
           avatar: p.photoUrl || "/placeholder.svg",
@@ -145,10 +195,13 @@ const FindPlayers = () => {
         setCurrentPage(1); // Сбрасываем на первую страницу при новом поиске/фильтрации
       } catch (error) {
         console.error("Ошибка при загрузке игроков:", error);
-        setFetchError("Не удалось загрузить список игроков. Пожалуйста, попробуйте позже.");
+        setFetchError(
+          "Не удалось загрузить список игроков. Пожалуйста, попробуйте позже."
+        );
         toast({
           title: "Ошибка загрузки",
-          description: "Не удалось загрузить данные игроков. Пожалуйста, попробуйте позже.",
+          description:
+            "Не удалось загрузить данные игроков. Пожалуйста, попробуйте позже.",
           variant: "destructive",
         });
       } finally {
@@ -166,10 +219,12 @@ const FindPlayers = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-       <div className="mb-6"> {/* Добавляем отступ снизу */}
+      <div className="mb-6">
+        {" "}
+        {/* Добавляем отступ снизу */}
         <Button
           variant="outline"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate("/dashboard")}
           className="flex items-center"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -180,7 +235,9 @@ const FindPlayers = () => {
       {/* Заголовок и описание */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Поиск игроков</h1>
-        <p className="text-gray-600">Найдите подходящих игроков для вашей команды</p>
+        <p className="text-gray-600">
+          Найдите подходящих игроков для вашей команды
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -197,7 +254,7 @@ const FindPlayers = () => {
               <CollapsibleTrigger asChild>
                 <Button variant="outline" className="w-full">
                   <Filter className="h-4 w-4 mr-2" />
-                  {isFiltersOpen ? 'Скрыть фильтры' : 'Показать фильтры'}
+                  {isFiltersOpen ? "Скрыть фильтры" : "Показать фильтры"}
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-4">
@@ -215,7 +272,9 @@ const FindPlayers = () => {
           {fetchError && (
             <div className="text-center py-12">
               <p className="text-red-500 text-lg mb-4">Ошибка: {fetchError}</p>
-              <p className="text-gray-400">Пожалуйста, проверьте подключение к сети или попробуйте позже.</p>
+              <p className="text-gray-400">
+                Пожалуйста, проверьте подключение к сети или попробуйте позже.
+              </p>
             </div>
           )}
 
@@ -229,7 +288,7 @@ const FindPlayers = () => {
 
               {/* Список игроков */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {currentPlayers.map(player => (
+                {currentPlayers.map((player) => (
                   <PlayerCard key={player.id} player={player} />
                 ))}
               </div>
@@ -237,8 +296,12 @@ const FindPlayers = () => {
               {/* Пустое состояние */}
               {players.length === 0 && (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg mb-4">Игроки не найдены</p>
-                  <p className="text-gray-400">Попробуйте изменить параметры поиска</p>
+                  <p className="text-gray-500 text-lg mb-4">
+                    Игроки не найдены
+                  </p>
+                  <p className="text-gray-400">
+                    Попробуйте изменить параметры поиска
+                  </p>
                 </div>
               )}
 
@@ -247,39 +310,42 @@ const FindPlayers = () => {
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
-                        href="#" 
+                      {/* Используем кастомный компонент */}
+                      <CustomPaginationPrevious
                         onClick={(e) => {
                           e.preventDefault();
                           if (currentPage > 1) setCurrentPage(currentPage - 1);
                         }}
-                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                        disabled={currentPage === 1} // Используем disabled вместо классов
                       />
                     </PaginationItem>
-                    
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentPage(page);
-                          }}
-                          isActive={page === currentPage}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCurrentPage(page);
+                            }}
+                            isActive={page === currentPage}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
 
                     <PaginationItem>
-                      <PaginationNext 
-                        href="#"
+                      {/* Используем кастомный компонент */}
+                      <CustomPaginationNext
                         onClick={(e) => {
                           e.preventDefault();
-                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                          if (currentPage < totalPages)
+                            setCurrentPage(currentPage + 1);
                         }}
-                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                        disabled={currentPage === totalPages} // Используем disabled
                       />
                     </PaginationItem>
                   </PaginationContent>

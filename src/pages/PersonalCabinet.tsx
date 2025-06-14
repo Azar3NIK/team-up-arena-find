@@ -1,19 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Save, User, AlertCircle, ArrowLeft, LogOut } from "lucide-react";
+import {
+  Camera,
+  Save,
+  User,
+  AlertCircle,
+  ArrowLeft,
+  LogOut,
+  Loader2,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { playerProfileService, PlayerProfileBackendData, UpdatePlayerProfileRequestData, axiosInstance } from "@/services/playerProfileService"; // Импортируем ваш сервис
+import {
+  playerProfileService,
+  PlayerProfileBackendData,
+  UpdatePlayerProfileRequestData,
+  axiosInstance,
+} from "@/services/playerProfileService";
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
-import { useAuth } from '@/context/AuthContext';
-
+import { useAuth } from "@/context/AuthContext";
+import { fileService } from "@/services/fileService";
 
 interface PlayerProfileFrontendState {
   id: string; // ID профиля, обязателен для существующего профиля
@@ -40,8 +59,7 @@ const PersonalCabinet = () => {
   const { logout } = useAuth();
 
   // Например, если пользователь залогинен, у него есть свой ID профиля.
-  const [currentProfileId, setCurrentProfileId] = useState<string | null>(null); 
-                                                                                                   
+  const [currentProfileId, setCurrentProfileId] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<PlayerProfileFrontendState>({
     id: "", // Будет загружен с бэкенда
@@ -59,88 +77,143 @@ const PersonalCabinet = () => {
     description: "",
     phone: "",
     email: "",
-    telegram: ""
+    telegram: "",
   });
 
-   const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState<PlayerProfileFrontendState>(profile);
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const [isLoading, setIsLoading] = useState(true);
-    const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<PlayerProfileFrontendState>(profile);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const uploadedUrl = await fileService.uploadFile(file);
+      // Обновляем formData с новым URL аватара
+      handleInputChange("avatar", uploadedUrl);
+      toast({ title: "Аватар успешно загружен!" });
+    } catch (error) {
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить аватар.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   // --- Вспомогательные функции для маппинга данных между фронтендом и бэкендом ---
   const mapSkillLevelToExperience = (skillLevel?: number): string => {
     switch (skillLevel) {
-      case 0: return "Новичок";
-      case 1: return "Любитель";
-      case 2: return "Полупрофессионал";
-      case 3: return "Профессионал";
-      default: return "Любитель"; // Дефолтное значение
+      case 0:
+        return "Новичок";
+      case 1:
+        return "Любитель";
+      case 2:
+        return "Полупрофессионал";
+      case 3:
+        return "Профессионал";
+      default:
+        return "Любитель"; // Дефолтное значение
     }
   };
 
   const mapExperienceToSkillLevel = (experience: string): number => {
     switch (experience) {
-      case "Новичок": return 0;
-      case "Любитель": return 1;
-      case "Полупрофессионал": return 2;
-      case "Профессионал": return 3;
-      default: return 1; // Дефолтное значение
+      case "Новичок":
+        return 0;
+      case "Любитель":
+        return 1;
+      case "Полупрофессионал":
+        return 2;
+      case "Профессионал":
+        return 3;
+      default:
+        return 1; // Дефолтное значение
     }
   };
 
-  const mapTeamFindingStatusToFrontend = (status?: number): "looking" | "has-team" | "not-looking" => {
+  const mapTeamFindingStatusToFrontend = (
+    status?: number
+  ): "looking" | "has-team" | "not-looking" => {
     switch (status) {
-      case 0: return "looking";
-      case 1: return "has-team";
-      case 2: return "not-looking";
-      default: return "not-looking"; // Дефолтное значение
+      case 0:
+        return "looking";
+      case 1:
+        return "has-team";
+      case 2:
+        return "not-looking";
+      default:
+        return "not-looking"; // Дефолтное значение
     }
   };
 
-  const mapTeamStatusToBackend = (status: "looking" | "has-team" | "not-looking"): number => {
+  const mapTeamStatusToBackend = (
+    status: "looking" | "has-team" | "not-looking"
+  ): number => {
     switch (status) {
-      case "looking": return 0;
-      case "has-team": return 1;
-      case "not-looking": return 2;
-      default: return 2; // Дефолтное значение
+      case "looking":
+        return 0;
+      case "has-team":
+        return 1;
+      case "not-looking":
+        return 2;
+      default:
+        return 2; // Дефолтное значение
     }
   };
 
   const getTeamStatusText = (status: string) => {
     switch (status) {
-      case 'looking': return 'Ищет команду';
-      case 'has-team': return 'В команде';
-      case 'not-looking': return 'Не ищет команду';
-      default: return status;
+      case "looking":
+        return "Ищет команду";
+      case "has-team":
+        return "В команде";
+      case "not-looking":
+        return "Не ищет команду";
+      default:
+        return status;
     }
   };
   // --- Конец вспомогательных функций ---
 
-
   // useEffect для загрузки данных профиля при монтировании компонента
   useEffect(() => {
     const fetchProfileData = async () => {
-        setIsLoading(true);
-        setFetchError(null);
-        try {
-                // Используем axiosInstance, экспортированный из playerProfileService
-                const response = await axiosInstance.get<string>("https://localhost:7260/playerprofiles/myprofileid");
-                const fetchedProfileId = response.data;
+      setIsLoading(true);
+      setFetchError(null);
+      try {
+        // Используем axiosInstance, экспортированный из playerProfileService
+        const response = await axiosInstance.get<string>(
+          "https://localhost:7260/playerprofiles/myprofileid"
+        );
+        const fetchedProfileId = response.data;
 
-                if (!fetchedProfileId) {
-                    throw new Error("Не удалось получить ID профиля текущего пользователя.");
-                }
-                setCurrentProfileId(fetchedProfileId);
-                
+        if (!fetchedProfileId) {
+          throw new Error(
+            "Не удалось получить ID профиля текущего пользователя."
+          );
+        }
+        setCurrentProfileId(fetchedProfileId);
 
-        const data: PlayerProfileBackendData = await playerProfileService.getProfileById(fetchedProfileId);
-        
+        const data: PlayerProfileBackendData =
+          await playerProfileService.getProfileById(fetchedProfileId);
+
         // Маппинг данных с бэкенда на фронтенд формат
         const mappedProfile: PlayerProfileFrontendState = {
           id: data.id,
           name: data.fullName || "",
-          avatar: data.photoUrl || "/placeholder.svg", 
+          avatar: data.photoUrl || "/placeholder.svg",
           location: data.location || "",
           sport: data.game || "",
           experience: mapSkillLevelToExperience(data.skillLevel),
@@ -153,17 +226,20 @@ const PersonalCabinet = () => {
           description: data.aboutMe || "",
           phone: data.phone || "",
           email: data.email || "",
-          telegram: data.telegram || ""
+          telegram: data.telegram || "",
         };
 
         setProfile(mappedProfile);
         setFormData(mappedProfile); // Инициализируем форму данными из профиля
       } catch (error) {
         console.error("Ошибка при загрузке профиля:", error);
-        setFetchError("Не удалось загрузить данные профиля. Возможно, вы не авторизованы или произошла ошибка сервера.");
+        setFetchError(
+          "Не удалось загрузить данные профиля. Возможно, вы не авторизованы или произошла ошибка сервера."
+        );
         toast({
           title: "Ошибка загрузки",
-          description: "Не удалось загрузить данные профиля. Пожалуйста, попробуйте позже.",
+          description:
+            "Не удалось загрузить данные профиля. Пожалуйста, попробуйте позже.",
           variant: "destructive",
         });
       } finally {
@@ -172,13 +248,16 @@ const PersonalCabinet = () => {
     };
 
     fetchProfileData();
-  }, [toast]); 
+  }, [toast]);
 
-  const handleInputChange = (field: keyof PlayerProfileFrontendState, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (
+    field: keyof PlayerProfileFrontendState,
+    value: string | number
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Очищаем ошибку при изменении поля
     if (errors[field]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
@@ -188,25 +267,37 @@ const PersonalCabinet = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    const requiredFields: Array<keyof PlayerProfileFrontendState> = ['name', 'location', 'sport', 'age', 'gender', 'phone', 'email'];
+    const requiredFields: Array<keyof PlayerProfileFrontendState> = [
+      "name",
+      "location",
+      "sport",
+      "age",
+      "gender",
+      "phone",
+      "email",
+    ];
 
-    requiredFields.forEach(field => {
-      if (!formData[field] || (typeof formData[field] === 'string' && (formData[field] as string).trim() === '')) {
-        newErrors[field as string] = 'Это поле обязательно для заполнения';
+    requiredFields.forEach((field) => {
+      if (
+        !formData[field] ||
+        (typeof formData[field] === "string" &&
+          (formData[field] as string).trim() === "")
+      ) {
+        newErrors[field as string] = "Это поле обязательно для заполнения";
       }
     });
 
     // Дополнительные проверки
     if (formData.age && (formData.age < 10 || formData.age > 100)) {
-      newErrors.age = 'Введите корректный возраст (10-100)';
+      newErrors.age = "Введите корректный возраст (10-100)";
     }
 
     if (formData.phone && !/^\+?[\d\s()-]+$/.test(formData.phone)) {
-      newErrors.phone = 'Введите корректный номер телефона';
+      newErrors.phone = "Введите корректный номер телефона";
     }
 
     if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
-      newErrors.email = 'Введите корректный email';
+      newErrors.email = "Введите корректный email";
     }
 
     setErrors(newErrors);
@@ -242,7 +333,8 @@ const PersonalCabinet = () => {
         phone: formData.phone,
         email: formData.email,
         telegram: formData.telegram,
-        photoUrl: formData.avatar === "/placeholder.svg" ? null : formData.avatar, // Если аватарка по умолчанию, отправляем null
+        photoUrl:
+          formData.avatar === "/placeholder.svg" ? null : formData.avatar, // Если аватарка по умолчанию, отправляем null
       };
 
       await playerProfileService.updateProfile(formData.id, dataToSave);
@@ -257,7 +349,8 @@ const PersonalCabinet = () => {
       console.error("Ошибка при сохранении профиля:", error);
       toast({
         title: "Ошибка сохранения",
-        description: "Не удалось сохранить изменения профиля. Пожалуйста, попробуйте снова.",
+        description:
+          "Не удалось сохранить изменения профиля. Пожалуйста, попробуйте снова.",
         variant: "destructive",
       });
     } finally {
@@ -273,21 +366,21 @@ const PersonalCabinet = () => {
 
   const handleLogout = async () => {
     try {
-        await authService.logout();
-        logout(); 
-        toast({
-            title: "Выход выполнен",
-            description: "Вы успешно вышли из своего аккаунта.",
-        });
-        // Перенаправляем на главную страницу или страницу входа
-         navigate("/"); 
+      await authService.logout();
+      logout();
+      toast({
+        title: "Выход выполнен",
+        description: "Вы успешно вышли из своего аккаунта.",
+      });
+      // Перенаправляем на главную страницу или страницу входа
+      navigate("/");
     } catch (error) {
-         // Эта ошибка будет вызвана, только если мы решим пробрасывать ее из сервиса
-         toast({
-            title: "Ошибка",
-             description: "Не удалось выполнить выход. Попробуйте снова.",
-             variant: "destructive",
-        });
+      // Эта ошибка будет вызвана, только если мы решим пробрасывать ее из сервиса
+      toast({
+        title: "Ошибка",
+        description: "Не удалось выполнить выход. Попробуйте снова.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -302,14 +395,16 @@ const PersonalCabinet = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-      <Button 
-           variant="outline" 
-            className="mb-6" 
-            onClick={() => navigate('/dashboard')}
-            >
-            <ArrowLeft className="h-4 w-4 mr-2" /> Назад к панели
+        <Button
+          variant="outline"
+          className="mb-6"
+          onClick={() => navigate("/dashboard")}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" /> Назад к панели
         </Button>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Личный кабинет</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Личный кабинет
+        </h1>
         <p className="text-gray-600">Управляйте своей анкетой игрока</p>
       </div>
 
@@ -322,24 +417,46 @@ const PersonalCabinet = () => {
             </CardHeader>
             <CardContent>
               <div className="text-center space-y-4">
-                <div className="relative">
-                  <Avatar className="h-24 w-24 mx-auto">
+                <div className="relative w-24 h-24 mx-auto group">
+                  {" "}
+                  {/* Добавили w-24, h-24 и group */}
+                  <Avatar className="h-full w-full">
+                    {" "}
+                    {/* Используем h-full, w-full */}
                     <AvatarImage src={formData.avatar} alt={formData.name} />
                     <AvatarFallback className="text-lg">
-                      {formData.name.split(' ').map(n => n[0]).join('')}
+                      {formData.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </AvatarFallback>
                   </Avatar>
+                  {/* Оверлей для загрузки теперь ВНУТРИ родительского div */}
                   {isEditing && (
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
+                    <div
+                      className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() =>
+                        !isUploading && fileInputRef.current?.click()
+                      } // Блокируем клик во время загрузки
                     >
-                      <Camera className="h-4 w-4" />
-                    </Button>
+                      {isUploading ? (
+                        <Loader2 className="h-6 w-6 text-white animate-spin" />
+                      ) : (
+                        <Camera className="h-6 w-6 text-white" />
+                      )}
+                    </div>
                   )}
                 </div>
-                
+
+                {/* Скрытый input для выбора файла */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/png, image/jpeg, image/gif"
+                  onChange={handleAvatarChange}
+                />
+
                 <div>
                   <h3 className="text-xl font-semibold">{formData.name}</h3>
                   <p className="text-gray-600">{formData.location}</p>
@@ -350,10 +467,15 @@ const PersonalCabinet = () => {
                     <Badge variant="outline">{formData.sport}</Badge>
                     <Badge variant="outline">{formData.experience}</Badge>
                   </div>
-                  <Badge className={
-                    formData.teamStatus === 'looking' ? 'bg-green-500' :
-                    formData.teamStatus === 'has-team' ? 'bg-gray-500' : 'bg-orange-500'
-                  }>
+                  <Badge
+                    className={
+                      formData.teamStatus === "looking"
+                        ? "bg-green-500"
+                        : formData.teamStatus === "has-team"
+                        ? "bg-gray-500"
+                        : "bg-orange-500"
+                    }
+                  >
                     {getTeamStatusText(formData.teamStatus)}
                   </Badge>
                 </div>
@@ -369,23 +491,22 @@ const PersonalCabinet = () => {
             </CardContent>
           </Card>
 
-             {/* карточка "Действия" с кнопкой выхода */}
-            <Card>
-                 <CardHeader>
-                     <CardTitle>Действия</CardTitle>
-                </CardHeader>
-                 <CardContent>
-                     <Button 
-                        variant="outline" 
-                         className="w-full text-destructive hover:text-destructive hover:bg-red-50"
-                         onClick={handleLogout}
-                     >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Выйти из аккаунта
-                    </Button>
-                </CardContent>
-            </Card>
-
+          {/* карточка "Действия" с кнопкой выхода */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Действия</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="outline"
+                className="w-full text-destructive hover:text-destructive hover:bg-red-50"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Выйти из аккаунта
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Форма редактирования */}
@@ -402,7 +523,11 @@ const PersonalCabinet = () => {
                 </Button>
               ) : (
                 <div className="space-x-2">
-                  <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isLoading}
+                  >
                     Отмена
                   </Button>
                   <Button onClick={handleSave} disabled={isLoading}>
@@ -412,7 +537,7 @@ const PersonalCabinet = () => {
                 </div>
               )}
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
               {/* Основная информация */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -421,7 +546,7 @@ const PersonalCabinet = () => {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
                     disabled={!isEditing || isLoading}
                   />
                   {errors.name && (
@@ -431,13 +556,15 @@ const PersonalCabinet = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div>
                   <Label htmlFor="location">Местоположение*</Label>
                   <Input
                     id="location"
                     value={formData.location}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("location", e.target.value)
+                    }
                     disabled={!isEditing || isLoading}
                   />
                   {errors.location && (
@@ -452,7 +579,7 @@ const PersonalCabinet = () => {
                   <Label>Вид спорта*</Label>
                   <Input
                     value={formData.sport}
-                    onChange={(e) => handleInputChange('sport', e.target.value)}
+                    onChange={(e) => handleInputChange("sport", e.target.value)}
                     disabled={!isEditing || isLoading}
                   />
                   {errors.sport && (
@@ -465,9 +592,11 @@ const PersonalCabinet = () => {
 
                 <div>
                   <Label>Уровень игры</Label>
-                  <Select 
-                    value={formData.experience} 
-                    onValueChange={(value) => handleInputChange('experience', value)}
+                  <Select
+                    value={formData.experience}
+                    onValueChange={(value) =>
+                      handleInputChange("experience", value)
+                    }
                     disabled={!isEditing || isLoading}
                   >
                     <SelectTrigger>
@@ -476,7 +605,9 @@ const PersonalCabinet = () => {
                     <SelectContent>
                       <SelectItem value="Новичок">Новичок</SelectItem>
                       <SelectItem value="Любитель">Любитель</SelectItem>
-                      <SelectItem value="Полупрофессионал">Полупрофессионал</SelectItem>
+                      <SelectItem value="Полупрофессионал">
+                        Полупрофессионал
+                      </SelectItem>
                       <SelectItem value="Профессионал">Профессионал</SelectItem>
                     </SelectContent>
                   </Select>
@@ -487,7 +618,9 @@ const PersonalCabinet = () => {
                   <Input
                     type="number"
                     value={formData.age}
-                    onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleInputChange("age", parseInt(e.target.value))
+                    }
                     disabled={!isEditing || isLoading}
                     min="10"
                     max="100"
@@ -502,9 +635,11 @@ const PersonalCabinet = () => {
 
                 <div>
                   <Label>Пол*</Label>
-                  <Select 
-                    value={formData.gender} 
-                    onValueChange={(value) => handleInputChange('gender', value)}
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(value) =>
+                      handleInputChange("gender", value)
+                    }
                     disabled={!isEditing || isLoading}
                   >
                     <SelectTrigger>
@@ -528,7 +663,12 @@ const PersonalCabinet = () => {
                   <Input
                     type="number"
                     value={formData.playExperienceYears}
-                    onChange={(e) => handleInputChange('playExperienceYears', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "playExperienceYears",
+                        parseInt(e.target.value)
+                      )
+                    }
                     disabled={!isEditing || isLoading}
                     min="0"
                     max="100"
@@ -537,9 +677,11 @@ const PersonalCabinet = () => {
 
                 <div>
                   <Label>Статус поиска команды</Label>
-                  <Select 
-                    value={formData.teamStatus} 
-                    onValueChange={(value) => handleInputChange('teamStatus', value)}
+                  <Select
+                    value={formData.teamStatus}
+                    onValueChange={(value) =>
+                      handleInputChange("teamStatus", value)
+                    }
                     disabled={!isEditing || isLoading}
                   >
                     <SelectTrigger>
@@ -548,7 +690,9 @@ const PersonalCabinet = () => {
                     <SelectContent>
                       <SelectItem value="looking">Ищет команду</SelectItem>
                       <SelectItem value="has-team">В команде</SelectItem>
-                      <SelectItem value="not-looking">Не ищет команду</SelectItem>
+                      <SelectItem value="not-looking">
+                        Не ищет команду
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -558,7 +702,9 @@ const PersonalCabinet = () => {
                   <Input
                     type="number"
                     value={formData.height}
-                    onChange={(e) => handleInputChange('height', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleInputChange("height", parseInt(e.target.value))
+                    }
                     disabled={!isEditing || isLoading}
                     min="100"
                     max="250"
@@ -570,7 +716,9 @@ const PersonalCabinet = () => {
                   <Input
                     type="number"
                     value={formData.weight}
-                    onChange={(e) => handleInputChange('weight', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleInputChange("weight", parseInt(e.target.value))
+                    }
                     disabled={!isEditing || isLoading}
                     min="30"
                     max="200"
@@ -584,7 +732,9 @@ const PersonalCabinet = () => {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   disabled={!isEditing || isLoading}
                   rows={4}
                   placeholder="Расскажите о себе, своем опыте и целях..."
@@ -593,14 +743,18 @@ const PersonalCabinet = () => {
 
               {/* Контактная информация */}
               <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4">Контактная информация</h3>
+                <h3 className="text-lg font-semibold mb-4">
+                  Контактная информация
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="phone">Телефон*</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("phone", e.target.value)
+                      }
                       disabled={!isEditing || isLoading}
                     />
                     {errors.phone && (
@@ -617,7 +771,9 @@ const PersonalCabinet = () => {
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
                       disabled={!isEditing || isLoading}
                     />
                     {errors.email && (
@@ -633,7 +789,9 @@ const PersonalCabinet = () => {
                     <Input
                       id="telegram"
                       value={formData.telegram}
-                      onChange={(e) => handleInputChange('telegram', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("telegram", e.target.value)
+                      }
                       disabled={!isEditing || isLoading}
                       placeholder="@username"
                     />
