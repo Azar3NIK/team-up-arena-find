@@ -1,8 +1,8 @@
 // playerProfileService.ts
-import axios from 'axios';
+import axios from "axios";
 
-// Базовый URL API. 
-const API_BASE_URL = 'https://localhost:7260/playerprofiles'; 
+// Базовый URL API.
+const API_BASE_URL = "https://localhost:7260/playerprofiles";
 
 export const axiosInstance = axios.create({
   // заставляет axios отправлять куки с кросс-доменными запросами
@@ -11,7 +11,6 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-
     return config;
   },
   (error) => {
@@ -39,6 +38,9 @@ export interface PlayerProfileBackendData {
   phone?: string;
   email?: string;
   telegram?: string;
+  game2?: string;
+  skillLevel2?: number;
+  playExperienceYears2?: number;
 }
 
 // Интерфейс для данных, отправляемых на бэкенд при обновлении
@@ -61,18 +63,21 @@ export interface UpdatePlayerProfileRequestData {
   phone?: string;
   email?: string;
   telegram?: string;
+  game2?: string;
+  skillLevel2?: number;
+  playExperienceYears2?: number;
 }
 
 // интерфейс для параметров фильтрации, соответствует PlayerProfileFilterRequest на бэкенде
 export interface PlayerProfileFilterRequest {
-    skillLevel?: number;
-    location?: string;
-    teamFindingStatus?: number;
-    game?: string;
-    playExperienceYears?: number;
-    age?: number;
-    fullName?: string; // Для поиска по имени
-    gender?: string;
+  skillLevel?: number;
+  location?: string;
+  teamFindingStatus?: number;
+  game?: string;
+  playExperienceYears?: number;
+  age?: number;
+  fullName?: string; // Для поиска по имени
+  gender?: string;
 }
 
 export const playerProfileService = {
@@ -82,7 +87,9 @@ export const playerProfileService = {
    */
   getProfileById: async (id: string): Promise<PlayerProfileBackendData> => {
     try {
-      const response = await axiosInstance.get<PlayerProfileBackendData>(`${API_BASE_URL}/${id}`);
+      const response = await axiosInstance.get<PlayerProfileBackendData>(
+        `${API_BASE_URL}/${id}`
+      );
       return response.data;
     } catch (error) {
       console.error(`Ошибка при получении профиля игрока с ID ${id}:`, error);
@@ -95,10 +102,15 @@ export const playerProfileService = {
    * @param id ID профиля игрока для обновления.
    * @param data Обновленные данные профиля в формате, ожидаемом бэкендом.
    */
-  updateProfile: async (id: string, data: UpdatePlayerProfileRequestData): Promise<string> => {
+  updateProfile: async (
+    id: string,
+    data: UpdatePlayerProfileRequestData
+  ): Promise<string> => {
     try {
-      
-      const response = await axiosInstance.put<string>(`${API_BASE_URL}/${id}`, data);
+      const response = await axiosInstance.put<string>(
+        `${API_BASE_URL}/${id}`,
+        data
+      );
       return response.data; // Ожидаем возвращение ID обновленного профиля
     } catch (error) {
       console.error(`Ошибка при обновлении профиля игрока с ID ${id}:`, error);
@@ -106,17 +118,22 @@ export const playerProfileService = {
     }
   },
 
-   /**
+  /**
    * Ищет профили игроков по заданным фильтрам.
    * @param filters Объект с параметрами фильтрации.
    */
-  searchProfiles: async (filters: PlayerProfileFilterRequest): Promise<PlayerProfileBackendData[]> => {
+  searchProfiles: async (
+    filters: PlayerProfileFilterRequest
+  ): Promise<PlayerProfileBackendData[]> => {
     try {
-      const response = await axiosInstance.get<PlayerProfileBackendData[]>(`${API_BASE_URL}/search`, { params: filters });
+      const response = await axiosInstance.get<PlayerProfileBackendData[]>(
+        `${API_BASE_URL}/search`,
+        { params: filters }
+      );
       return response.data;
     } catch (error) {
-      console.error('Ошибка при поиске профилей игроков:', error);
+      console.error("Ошибка при поиске профилей игроков:", error);
       throw error;
     }
-  }
+  },
 };

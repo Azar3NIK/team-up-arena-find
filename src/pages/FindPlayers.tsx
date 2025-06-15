@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/custom-pagination";
 
 // Frontend interface для PlayerCard, чтобы отображать данные
-interface PlayerCardProps {
+interface PlayerCardData {
   id: string;
   name: string;
   avatar?: string;
@@ -39,6 +39,8 @@ interface PlayerCardProps {
   teamStatus: "looking" | "has-team" | "not-looking"; // Соответствует 'teamFindingStatus' на бэкенде
   age: number;
   gender: string;
+  sport2?: string;
+  experience2?: string;
 }
 
 // Интерфейс для состояния фильтров на фронтенде
@@ -68,7 +70,7 @@ const FindPlayers = () => {
     gender: "all", // Изначально выбрано "все"
   });
 
-  const [players, setPlayers] = useState<PlayerCardProps[]>([]);
+  const [players, setPlayers] = useState<PlayerCardData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -179,7 +181,7 @@ const FindPlayers = () => {
           await playerProfileService.searchProfiles(backendFilters);
 
         // Сопоставляем данные бэкенда с форматом PlayerCardProps для фронтенда
-        const mappedPlayers: PlayerCardProps[] = data.map((p) => ({
+        const mappedPlayers: PlayerCardData[] = data.map((p) => ({
           id: p.id,
           name: p.fullName || "Имя не указано",
           avatar: p.photoUrl || "/placeholder.svg",
@@ -189,6 +191,10 @@ const FindPlayers = () => {
           teamStatus: mapTeamFindingStatusToFrontend(p.teamFindingStatus),
           age: p.age || 0, // Убедитесь, что age это число
           gender: p.gender || "Не указан",
+          sport2: p.game2 || undefined, // undefined, если null или пустая строка
+          experience2: p.game2
+            ? mapSkillLevelToExperience(p.skillLevel2)
+            : undefined,
         }));
 
         setPlayers(mappedPlayers);

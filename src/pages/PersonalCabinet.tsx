@@ -51,6 +51,10 @@ interface PlayerProfileFrontendState {
   phone: string;
   email: string;
   telegram: string;
+  // --- Спорт #2 (опционально) ---
+  sport2: string;
+  experience2: string;
+  playExperienceYears2: number;
 }
 
 const PersonalCabinet = () => {
@@ -78,6 +82,10 @@ const PersonalCabinet = () => {
     phone: "",
     email: "",
     telegram: "",
+    // Спорт #2
+    sport2: "",
+    experience2: "Любитель",
+    playExperienceYears2: 0,
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -129,6 +137,7 @@ const PersonalCabinet = () => {
   };
 
   const mapExperienceToSkillLevel = (experience: string): number => {
+    if (!experience) return undefined; // Если строка пустая, возвращаем undefined
     switch (experience) {
       case "Новичок":
         return 0;
@@ -227,6 +236,9 @@ const PersonalCabinet = () => {
           phone: data.phone || "",
           email: data.email || "",
           telegram: data.telegram || "",
+          sport2: data.game2 || "",
+          experience2: mapSkillLevelToExperience(data.skillLevel2),
+          playExperienceYears2: data.playExperienceYears2 || 0,
         };
 
         setProfile(mappedProfile);
@@ -335,6 +347,13 @@ const PersonalCabinet = () => {
         telegram: formData.telegram,
         photoUrl:
           formData.avatar === "/placeholder.svg" ? null : formData.avatar, // Если аватарка по умолчанию, отправляем null
+        game2: formData.sport2 || null, // Отправляем null, если поле пустое
+        skillLevel2: formData.sport2
+          ? mapExperienceToSkillLevel(formData.experience2)
+          : null,
+        playExperienceYears2: formData.sport2
+          ? formData.playExperienceYears2
+          : null,
       };
 
       await playerProfileService.updateProfile(formData.id, dataToSave);
@@ -466,6 +485,22 @@ const PersonalCabinet = () => {
                   <div className="flex justify-center gap-2">
                     <Badge variant="outline">{formData.sport}</Badge>
                     <Badge variant="outline">{formData.experience}</Badge>
+                    {formData.sport2 && (
+                      <>
+                        <Badge
+                          variant="outline"
+                          className="bg-sky-100 border-sky-300 text-sky-800"
+                        >
+                          {formData.sport2}
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className="bg-sky-100 border-sky-300 text-sky-800"
+                        >
+                          {formData.experience2}
+                        </Badge>
+                      </>
+                    )}
                   </div>
                   <Badge
                     className={
@@ -575,42 +610,122 @@ const PersonalCabinet = () => {
                   )}
                 </div>
 
-                <div>
-                  <Label>Вид спорта*</Label>
-                  <Input
-                    value={formData.sport}
-                    onChange={(e) => handleInputChange("sport", e.target.value)}
-                    disabled={!isEditing || isLoading}
-                  />
-                  {errors.sport && (
-                    <div className="flex items-center text-red-500 text-sm mt-1">
-                      <AlertCircle className="h-4 w-4 mr-1" />
-                      {errors.sport}
+                {/* БЛОК ДЛЯ ПЕРВОГО ВИДА СПОРТА */}
+                <div className="border-t pt-4">
+                  <h4 className="text-md font-semibold mb-3">Вид спорта #1</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2">
+                      <Label>Вид спорта*</Label>
+                      <Input
+                        value={formData.sport}
+                        onChange={(e) =>
+                          handleInputChange("sport", e.target.value)
+                        }
+                        disabled={!isEditing || isLoading}
+                      />
+                      {errors.sport && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.sport}
+                        </p>
+                      )}
                     </div>
-                  )}
+                    <div>
+                      <Label>Стаж (лет)</Label>
+                      <Input
+                        type="number"
+                        value={formData.playExperienceYears}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "playExperienceYears",
+                            parseInt(e.target.value)
+                          )
+                        }
+                        disabled={!isEditing || isLoading}
+                      />
+                    </div>
+                    <div className="md:col-span-3">
+                      <Label>Уровень игры</Label>
+                      <Select
+                        value={formData.experience}
+                        onValueChange={(value) =>
+                          handleInputChange("experience", value)
+                        }
+                        disabled={!isEditing || isLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Новичок">Новичок</SelectItem>
+                          <SelectItem value="Любитель">Любитель</SelectItem>
+                          <SelectItem value="Полупрофессионал">
+                            Полупрофессионал
+                          </SelectItem>
+                          <SelectItem value="Профессионал">
+                            Профессионал
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <Label>Уровень игры</Label>
-                  <Select
-                    value={formData.experience}
-                    onValueChange={(value) =>
-                      handleInputChange("experience", value)
-                    }
-                    disabled={!isEditing || isLoading}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Новичок">Новичок</SelectItem>
-                      <SelectItem value="Любитель">Любитель</SelectItem>
-                      <SelectItem value="Полупрофессионал">
-                        Полупрофессионал
-                      </SelectItem>
-                      <SelectItem value="Профессионал">Профессионал</SelectItem>
-                    </SelectContent>
-                  </Select>
+                {/* БЛОК ДЛЯ ВТОРОГО ВИДА СПОРТА */}
+                <div className="border-t pt-4">
+                  <h4 className="text-md font-semibold mb-3">
+                    Вид спорта #2 (опционально)
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2">
+                      <Label>Вид спорта</Label>
+                      <Input
+                        value={formData.sport2}
+                        onChange={(e) =>
+                          handleInputChange("sport2", e.target.value)
+                        }
+                        disabled={!isEditing || isLoading}
+                        placeholder="Не указано"
+                      />
+                    </div>
+                    <div>
+                      <Label>Стаж (лет)</Label>
+                      <Input
+                        type="number"
+                        value={formData.playExperienceYears2}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "playExperienceYears2",
+                            parseInt(e.target.value)
+                          )
+                        }
+                        disabled={!isEditing || isLoading}
+                      />
+                    </div>
+                    <div className="md:col-span-3">
+                      <Label>Уровень игры</Label>
+                      <Select
+                        value={formData.experience2}
+                        onValueChange={(value) =>
+                          handleInputChange("experience2", value)
+                        }
+                        disabled={!isEditing || isLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Новичок">Новичок</SelectItem>
+                          <SelectItem value="Любитель">Любитель</SelectItem>
+                          <SelectItem value="Полупрофессионал">
+                            Полупрофессионал
+                          </SelectItem>
+                          <SelectItem value="Профессионал">
+                            Профессионал
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
 
                 <div>

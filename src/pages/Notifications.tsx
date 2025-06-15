@@ -18,6 +18,8 @@ import {
   Inbox,
   Calendar,
   Eye,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -173,6 +175,71 @@ const ApplicationCard = ({
     </CardContent>
   </Card>
 );
+
+const ApplicationStatusCard = ({
+  notification,
+  onMarkAsRead,
+}: {
+  notification: GenericNotificationData;
+  onMarkAsRead: (id: string) => void; // Определяем его тип
+}) => {
+  const isAccepted = notification.type === 3; // 3 соответствует ApplicationAccepted
+  return (
+    // Добавляем flex flex-col, чтобы футер прижался к низу
+    <Card
+      className={
+        (isAccepted
+          ? "bg-green-50 border-green-200"
+          : "bg-red-50 border-red-200") + " flex flex-col"
+      }
+    >
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          {isAccepted ? (
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+          ) : (
+            <XCircle className="h-5 w-5 text-red-600" />
+          )}
+          Ответ на вашу заявку
+        </CardTitle>
+        <CardDescription>
+          Получено:{" "}
+          {new Date(notification.createdAt).toLocaleString("ru-RU", {
+            day: "numeric",
+            month: "long",
+          })}
+        </CardDescription>
+      </CardHeader>
+
+      {/* Добавляем flex-grow, чтобы контент занимал все доступное место */}
+      <CardContent className="flex-grow">
+        <p className="text-gray-800">{notification.message}</p>
+        {notification.relatedEntityId && (
+          <div className="mt-3">
+            <Link to={`/team/${notification.relatedEntityId}`}>
+              <Button variant="outline" size="sm">
+                Перейти к команде
+              </Button>
+            </Link>
+          </div>
+        )}
+      </CardContent>
+
+      <div className="p-4 pt-0 border-t flex justify-end">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-gray-600 hover:text-gray-900"
+          // При клике вызываем функцию onMarkAsRead, передавая ID этого уведомления
+          onClick={() => onMarkAsRead(notification.id)}
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          Понятно
+        </Button>
+      </div>
+    </Card>
+  );
+};
 
 const TrainingNotificationCard = ({
   notification,
@@ -353,6 +420,15 @@ const Notifications = () => {
       case 2: // Число соответствует enum NotificationType.NewTraining
         return (
           <TrainingNotificationCard
+            key={notification.id}
+            notification={notification}
+            onMarkAsRead={handleDismissNotification}
+          />
+        );
+      case 3: // ApplicationAccepted
+      case 4: // ApplicationDeclined
+        return (
+          <ApplicationStatusCard
             key={notification.id}
             notification={notification}
             onMarkAsRead={handleDismissNotification}

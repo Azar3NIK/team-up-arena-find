@@ -3,46 +3,66 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Gamepad2, Users } from "lucide-react";
-import { Link } from "react-router-dom"; 
+import { MapPin, Gamepad2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
-// Тип пропсов для карточки
-interface PlayerCardProps {
-  player: {
-    id: string;
-    name: string;
-    avatar?: string;
-    location: string;
-    sport: string;
-    experience: string;
-    teamStatus: "looking" | "has-team" | "not-looking";
-  };
+// Интерфейс для данных, которые получает компонент
+interface PlayerCardData {
+  id: string;
+  name: string;
+  avatar?: string;
+  location: string;
+  teamStatus: "looking" | "has-team" | "not-looking";
+  sport: string;
+  experience: string;
+  sport2?: string;
+  experience2?: string;
 }
 
+// Пропсы компонента
+interface PlayerCardProps {
+  player: PlayerCardData;
+}
+
+// Вспомогательная функция для статуса
 const getTeamStatusBadge = (status: "looking" | "has-team" | "not-looking") => {
   switch (status) {
-    case "looking": return <Badge className="bg-green-100 text-green-800 border-green-200">Ищет команду</Badge>;
-    case "has-team": return <Badge variant="secondary">В команде</Badge>;
-    case "not-looking": return <Badge variant="outline">Не ищет</Badge>;
-    default: return null;
+    case "looking":
+      return (
+        <Badge className="bg-green-100 text-green-800 border-green-200">
+          Ищет команду
+        </Badge>
+      );
+    case "has-team":
+      return <Badge variant="secondary">В команде</Badge>;
+    case "not-looking":
+      return <Badge variant="outline">Не ищет</Badge>;
+    default:
+      return null;
   }
 };
 
 export const PlayerCard = ({ player }: PlayerCardProps) => {
   return (
-    // Оборачиваем Card в Link, который ведет на страницу профиля
-    <Link to={`/player/${player.id}`} className="block hover:shadow-lg transition-shadow rounded-lg">
-      <Card className="h-full">
+    <Link
+      to={`/player/${player.id}`}
+      className="block hover:shadow-lg transition-shadow rounded-lg h-full"
+    >
+      <Card className="flex flex-col h-full">
         <CardHeader>
           <div className="flex items-center space-x-4">
-            <Avatar className="h-16 w-16">
+            <Avatar className="h-14 w-14">
               <AvatarImage src={player.avatar} alt={player.name} />
               <AvatarFallback className="text-xl">
-                {player.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                {player.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-xl">{player.name}</CardTitle>
+              <CardTitle className="text-lg">{player.name}</CardTitle>
               <div className="flex items-center space-x-1 text-sm text-gray-500 mt-1">
                 <MapPin className="h-4 w-4" />
                 <span>{player.location}</span>
@@ -50,13 +70,29 @@ export const PlayerCard = ({ player }: PlayerCardProps) => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Gamepad2 className="h-3 w-3" /> {player.sport}
-            </Badge>
-            <Badge variant="outline">{player.experience}</Badge>
-            {getTeamStatusBadge(player.teamStatus)}
+        <CardContent className="flex flex-col flex-grow justify-end space-y-2">
+          {/* Статус поиска команды */}
+          <div>{getTeamStatusBadge(player.teamStatus)}</div>
+
+          {/* Контейнер для видов спорта */}
+          <div className="space-y-2">
+            {/* Первый вид спорта */}
+            <div className="flex items-center gap-2 text-sm">
+              <Gamepad2 className="h-4 w-4 text-gray-500" />
+              <span>{player.sport}:</span>
+              <Badge variant="secondary">{player.experience}</Badge>
+            </div>
+
+            {/* Второй вид спорта (если есть) */}
+            {player.sport2 && (
+              <div className="flex items-center gap-2 text-sm">
+                <Gamepad2 className="h-4 w-4 text-sky-600" />
+                <span>{player.sport2}:</span>
+                <Badge className="bg-sky-100 text-sky-800 border-sky-200 hover:bg-sky-200">
+                  {player.experience2}
+                </Badge>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
