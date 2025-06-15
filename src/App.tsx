@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import Notifications from "./pages/Notifications";
 import MyTeam from "./pages/MyTeam";
 import CreateTeam from "./pages/CreateTeam";
 import NotFound from "./pages/NotFound";
+import EditTeam from "./pages/EditTeam";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +43,8 @@ const App = () => (
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/my-team" element={<MyTeam />} />
           <Route path="/create-team" element={<CreateTeam />} />
-  
+          <Route path="/team/:id/edit" element={<EditTeam />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

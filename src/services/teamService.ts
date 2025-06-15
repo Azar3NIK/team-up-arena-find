@@ -1,12 +1,20 @@
 // src/services/teamService.ts
-import axios from 'axios';
-
+import axios from "axios";
 
 export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-const API_BASE_URL = 'https://localhost:7260/team'; 
+const API_BASE_URL = "https://localhost:7260/team";
+
+export interface UpdateTeamData {
+  name: string;
+  sportType: string | null;
+  logoUrl?: string | null; // Опционально, т.к. мы его не редактируем
+  creationYear: number;
+  teamSkillLevel: number;
+  aboutTeam: string | null;
+}
 
 export interface MemberData {
   id: string;
@@ -88,7 +96,9 @@ export const teamService = {
    */
   leaveTeam: async (): Promise<string> => {
     try {
-      const response = await axiosInstance.post<string>(`${API_BASE_URL}/leave`);
+      const response = await axiosInstance.post<string>(
+        `${API_BASE_URL}/leave`
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при выходе из команды:", error);
@@ -103,7 +113,9 @@ export const teamService = {
    */
   removeMember: async (teamId: string, memberId: string): Promise<string> => {
     try {
-      const response = await axiosInstance.post<string>(`${API_BASE_URL}/${teamId}/remove-member/${memberId}`);
+      const response = await axiosInstance.post<string>(
+        `${API_BASE_URL}/${teamId}/remove-member/${memberId}`
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при исключении участника:", error);
@@ -112,9 +124,12 @@ export const teamService = {
   },
   searchTeams: async (filters: TeamSearchFilters): Promise<TeamData[]> => {
     try {
-      const response = await axiosInstance.get<TeamData[]>(`${API_BASE_URL}/search`, {
-        params: filters
-      });
+      const response = await axiosInstance.get<TeamData[]>(
+        `${API_BASE_URL}/search`,
+        {
+          params: filters,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при поиске команд:", error);
@@ -122,16 +137,52 @@ export const teamService = {
     }
   },
 
-   /**
+  /**
    * Получает детальную информацию о команде по ее ID.
    * @param id ID команды.
    */
   getTeamById: async (id: string): Promise<TeamData> => {
     try {
-      const response = await axiosInstance.get<TeamData>(`${API_BASE_URL}/${id}`);
+      const response = await axiosInstance.get<TeamData>(
+        `${API_BASE_URL}/${id}`
+      );
       return response.data;
     } catch (error) {
       console.error(`Ошибка при получении команды с ID ${id}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Обновляет данные команды.
+   * @param id ID команды для обновления.
+   * @param data Обновленные данные.
+   */
+  updateTeam: async (id: string, data: UpdateTeamData): Promise<string> => {
+    try {
+      const response = await axiosInstance.put<string>(
+        `${API_BASE_URL}/${id}`,
+        data
+      );
+      return response.data; // Ожидаем ID обновленной команды
+    } catch (error) {
+      console.error(`Ошибка при обновлении команды ${id}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Удаляет команду.
+   * @param id ID команды для удаления.
+   */
+  deleteTeam: async (id: string): Promise<string> => {
+    try {
+      const response = await axiosInstance.delete<string>(
+        `${API_BASE_URL}/${id}`
+      );
+      return response.data; // Ожидаем ID удаленной команды
+    } catch (error) {
+      console.error(`Ошибка при удалении команды ${id}:`, error);
       throw error;
     }
   },

@@ -1,7 +1,7 @@
 // --- MyTeam.tsx ---
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -186,9 +186,15 @@ const MyTeam = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-4">
                     <h1 className="text-3xl font-bold">{teamData.name}</h1>
-                    {/* {isCaptain && (
-                      <Button variant="outline" size="sm"><Settings className="h-4 w-4 mr-2" />Настройки команды</Button>
-                    )} */}
+                    {isCaptain && (
+                      // Оборачиваем кнопку в Link
+                      <Link to={`/team/${teamData.id}/edit`}>
+                        <Button variant="outline" size="sm">
+                          <Settings className="h-4 w-4 mr-2" />
+                          Настройки команды
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                     <div className="flex items-center space-x-2">
