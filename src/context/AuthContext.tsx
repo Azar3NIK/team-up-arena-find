@@ -1,7 +1,14 @@
 // src/context/AuthContext.tsx
 
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { axiosInstance } from '@/services/playerProfileService'; // Используем общий экземпляр axios
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
+import { axiosInstance } from "@/services/playerProfileService"; // Используем общий экземпляр axios
+import { basePath } from "@/const";
 
 // Интерфейс для данных пользователя
 interface User {
@@ -34,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         // Мы предполагаем, что у вас будет такой эндпоинт.
         // Он просто вернет 200 OK и данные пользователя, если кука валидна, или 401, если нет.
-        const response = await axiosInstance.get<User>('https://localhost:7260/users/me');
+        const response = await axiosInstance.get<User>(`${basePath}users/me`);
         setUser(response.data);
       } catch (error) {
         // Если получаем ошибку (например, 401), значит, пользователь не авторизован
@@ -66,18 +73,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Создаем кастомный хук для удобного использования контекста
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

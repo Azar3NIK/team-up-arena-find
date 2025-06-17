@@ -1,8 +1,9 @@
 // applicationService.ts
 
 import { axiosInstance } from "./playerProfileService";
+import { basePath } from "@/const";
 
-const API_BASE_URL = "https://localhost:7260/applications";
+const API_BASE_URL = basePath;
 
 // Интерфейс для заявки, которая приходит капитану в уведомления
 // Соответствует TeamApplicationResponse.cs

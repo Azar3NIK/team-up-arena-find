@@ -1,11 +1,12 @@
 // src/services/teamService.ts
 import axios from "axios";
+import { basePath } from "@/const";
 
 export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-const API_BASE_URL = "https://localhost:7260/team";
+const API_BASE_URL = `${basePath}team`;
 
 export interface UpdateTeamData {
   name: string;

@@ -1,7 +1,8 @@
 // invitationService.ts
 import { axiosInstance } from "./playerProfileService";
+import { basePath } from "@/const";
 
-const API_BASE_URL = "https://localhost:7260/invitations";
+const API_BASE_URL = `${basePath}invitations`;
 
 // Интерфейс для данных, которые приходят с бэкенда
 // Соответствует вашему TeamInvitationResponse.cs

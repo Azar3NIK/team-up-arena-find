@@ -1,7 +1,8 @@
 // src/services/authService.ts
-import { axiosInstance } from './playerProfileService';
+import { axiosInstance } from "./playerProfileService";
+import { basePath } from "@/const";
 
-const API_BASE_URL = 'https://localhost:7260'; // Базовый URL API
+const API_BASE_URL = basePath; // Базовый URL API
 
 export const authService = {
   /**
@@ -10,11 +11,9 @@ export const authService = {
    */
   logout: async (): Promise<void> => {
     try {
-      await axiosInstance.post(`${API_BASE_URL}/logout`);
+      await axiosInstance.post(`${API_BASE_URL}logout`);
     } catch (error) {
-
       console.error("Ошибка при выходе из системы на сервере:", error);
-
     }
   },
 };

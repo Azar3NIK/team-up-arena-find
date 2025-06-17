@@ -1,8 +1,9 @@
 // playerProfileService.ts
 import axios from "axios";
+import { basePath } from "@/const";
 
 // Базовый URL API.
-const API_BASE_URL = "https://localhost:7260/playerprofiles";
+const API_BASE_URL = `${basePath}playerprofiles`;
 
 export const axiosInstance = axios.create({
   // заставляет axios отправлять куки с кросс-доменными запросами

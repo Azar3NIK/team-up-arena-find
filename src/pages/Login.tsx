@@ -2,16 +2,23 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Users, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from "@/context/AuthContext";
+import { basePath } from "@/const";
 
 const Login = () => {
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -32,7 +39,8 @@ const Login = () => {
       }
 
       // --- Запрос к ASP.NET бэкенду ---
-      const response = await fetch("https://localhost:7260/login", { //  HTTPS URL бэкенда
+      const response = await fetch(`${basePath}login`, {
+        //  HTTPS URL бэкенда
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,10 +62,14 @@ const Login = () => {
       } else {
         // Обработка ошибок с бэкенда
         const errorData = await response.json(); // Ожидаем ProblemDetails JSON от ASP.NET Core
-        setError(errorData.detail || errorData.title || "Неверный email или пароль.");
+        setError(
+          errorData.detail || errorData.title || "Неверный email или пароль."
+        );
       }
     } catch (err) {
-      setError("Не удалось подключиться к серверу. Пожалуйста, проверьте ваше соединение или попробуйте позже.");
+      setError(
+        "Не удалось подключиться к серверу. Пожалуйста, проверьте ваше соединение или попробуйте позже."
+      );
       console.error("Login error:", err);
     } finally {
       setIsLoading(false);
@@ -67,7 +79,7 @@ const Login = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -79,7 +91,9 @@ const Login = () => {
             <div className="w-10 h-10 gradient-sport rounded-lg flex items-center justify-center">
               <Users className="h-6 w-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-sport-navy">FindPlayer</span>
+            <span className="text-2xl font-bold text-sport-navy">
+              FindPlayer
+            </span>
           </div>
           <CardTitle className="text-2xl font-bold">Вход</CardTitle>
           <CardDescription>
@@ -93,7 +107,7 @@ const Login = () => {
               <span className="text-sm">{error}</span>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -107,7 +121,7 @@ const Login = () => {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Пароль</Label>
               <div className="relative">
@@ -125,30 +139,37 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>
-            
+
             {/* <div className="flex items-center justify-between">
               <Link to="/forgot-password" className="text-sm text-sport-orange hover:underline">
                 Забыли пароль?
               </Link>
             </div> */}
-            
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               className="w-full gradient-orange text-white hover:opacity-90"
               disabled={isLoading}
             >
               {isLoading ? "Вход..." : "Войти"}
             </Button>
           </form>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Нет аккаунта?{" "}
-              <Link to="/register" className="text-sport-orange hover:underline">
+              <Link
+                to="/register"
+                className="text-sport-orange hover:underline"
+              >
                 Зарегистрироваться
               </Link>
             </p>

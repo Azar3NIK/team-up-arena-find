@@ -1,7 +1,8 @@
 // trainingService.ts
-import { axiosInstance } from './playerProfileService'; 
+import { axiosInstance } from "./playerProfileService";
+import { basePath } from "@/const";
 
-const API_BASE_URL = 'https://localhost:7260/trainings';
+const API_BASE_URL = `${basePath}trainings`;
 
 // Интерфейс для данных тренировки, которые приходят с бэкенда
 // Соответствует TrainingResponse.cs
@@ -29,9 +30,14 @@ export const trainingService = {
   /**
    * Создает новую тренировку.
    */
-  createTraining: async (data: CreateTrainingData): Promise<{ trainingId: string }> => {
+  createTraining: async (
+    data: CreateTrainingData
+  ): Promise<{ trainingId: string }> => {
     try {
-      const response = await axiosInstance.post<{ trainingId: string }>(`${API_BASE_URL}`, data);
+      const response = await axiosInstance.post<{ trainingId: string }>(
+        `${API_BASE_URL}`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при создании тренировки:", error);
@@ -44,25 +50,29 @@ export const trainingService = {
    */
   getMyTeamTrainings: async (): Promise<TrainingData[]> => {
     try {
-      const response = await axiosInstance.get<TrainingData[]>(`${API_BASE_URL}/my-team`);
+      const response = await axiosInstance.get<TrainingData[]>(
+        `${API_BASE_URL}/my-team`
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при получении тренировок:", error);
       throw error;
     }
   },
-  
+
   /**
    * Помечает тренировку как завершенную.
    * @param id ID тренировки.
    */
   completeTraining: async (id: string): Promise<string> => {
     try {
-      const response = await axiosInstance.post<string>(`${API_BASE_URL}/${id}/complete`);
+      const response = await axiosInstance.post<string>(
+        `${API_BASE_URL}/${id}/complete`
+      );
       return response.data; // Ожидаем сообщение об успехе
     } catch (error) {
-        console.error("Ошибка при завершении тренировки:", error);
-        throw error;
+      console.error("Ошибка при завершении тренировки:", error);
+      throw error;
     }
   },
 };

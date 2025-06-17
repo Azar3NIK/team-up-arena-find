@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { basePath } from "@/const";
 import {
   Select,
   SelectContent,
@@ -204,7 +205,7 @@ const PersonalCabinet = () => {
       try {
         // Используем axiosInstance, экспортированный из playerProfileService
         const response = await axiosInstance.get<string>(
-          "https://localhost:7260/playerprofiles/myprofileid"
+          `${basePath}playerprofiles/myprofileid`
         );
         const fetchedProfileId = response.data;
 

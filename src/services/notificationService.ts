@@ -1,7 +1,8 @@
-import { axiosInstance } from './playerProfileService'; 
+import { axiosInstance } from "./playerProfileService";
+import { basePath } from "@/const";
 
 // Определяем базовый URL для нового контроллера
-const API_BASE_URL = 'https://localhost:7260/notifications';
+const API_BASE_URL = `${basePath}notifications`;
 
 // Интерфейс для универсального уведомления, который соответствует NotificationResponse.cs
 export interface GenericNotificationData {
@@ -20,7 +21,9 @@ export const notificationService = {
   getMyGenericNotifications: async (): Promise<GenericNotificationData[]> => {
     try {
       // Делаем запрос на новый эндпоинт GET /notifications/generic
-      const response = await axiosInstance.get<GenericNotificationData[]>(`${API_BASE_URL}/generic`);
+      const response = await axiosInstance.get<GenericNotificationData[]>(
+        `${API_BASE_URL}/generic`
+      );
       return response.data;
     } catch (error) {
       console.error("Ошибка при получении универсальных уведомлений:", error);
@@ -29,7 +32,7 @@ export const notificationService = {
     }
   },
 
- /**
+  /**
    * Удаляет (скрывает) уведомление.
    * @param notificationId ID уведомления.
    */
@@ -38,7 +41,10 @@ export const notificationService = {
       // Вызываем DELETE эндпоинт
       await axiosInstance.delete(`${API_BASE_URL}/${notificationId}/dismiss`);
     } catch (error) {
-      console.error(`Ошибка при удалении уведомления ${notificationId}:`, error);
+      console.error(
+        `Ошибка при удалении уведомления ${notificationId}:`,
+        error
+      );
       throw error; // Пробрасываем ошибку, чтобы показать toast
     }
   },
