@@ -3,7 +3,7 @@
 import { axiosInstance } from "./playerProfileService";
 import { basePath } from "@/const";
 
-const API_BASE_URL = basePath;
+const API_BASE_URL = `${basePath}applications`;
 
 // Интерфейс для заявки, которая приходит капитану в уведомления
 // Соответствует TeamApplicationResponse.cs
